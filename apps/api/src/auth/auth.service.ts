@@ -3,16 +3,52 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
+import argon2 from 'argon2';
+
+const COOKIE_NAME = 'tg_session';
 
 @Injectable()
 export class AuthService {
   constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService, private readonly config: ConfigService) {}
 
+  private cookieOptions() {
+    const isProd = this.config.get<string>('NODE_ENV') === 'production';
+    const cookieMode = this.config.get<string>('COOKIE_MODE') === 'cross-site';
+    return {
+      httpOnly: true,
+      secure: isProd || cookieMode,
+      sameSite: (cookieMode ? 'none' : 'lax') as 'lax' | 'none',
+      path: '/',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    };
+  }
+
   private createGoogleClient(): { client: OAuth2Client; clientId: string } {
     const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
     const clientSecret = this.config.get<string>('GOOGLE_CLIENT_SECRET');
     if (!clientId || !clientSecret) throw new ServiceUnavailableException({ code: 'GOOGLE_AUTH_NOT_CONFIGURED', message: 'Google sign-in is not configured yet.' });
-    return { client: new OAuth2Client(clientId, clientSecret, this.config.getOrThrow<string>('WEB_ORIGIN')), clientId };
+    return { client: new OAuth2Client(clientId, clientSecret, this.config.getOrThrow<string>('WEB_ORIGINS')), clientId };
+  }
+
+  async register(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
+    const existing = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    if (existing) throw new UnauthorizedException({ code: 'AUTH_INVALID', message: 'An account with this email already exists.' });
+    const passwordHash = await argon2.hash(password);
+    const user = await this.prisma.user.create({ data: { email: email.toLowerCase(), passwordHash } });
+    return this.issueSession(user);
+  }
+
+  async login(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
+    const user = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
+    if (!user || !user.passwordHash) throw new UnauthorizedException({ code: 'AUTH_INVALID', message: 'Invalid email or password.' });
+    const valid = await argon2.verify(user.passwordHash, password);
+    if (!valid) throw new UnauthorizedException({ code: 'AUTH_INVALID', message: 'Invalid email or password.' });
+    return this.issueSession(user);
+  }
+
+  private async issueSession(user: { id: string; email: string }): Promise<{ token: string; user: { id: string; email: string } }> {
+    const token = await this.jwt.signAsync({ sub: user.id, email: user.email }, { expiresIn: '7d' });
+    return { token, user: { id: user.id, email: user.email } };
   }
 
   async signInWithGoogleCode(code: string): Promise<{ token: string; user: { id: string; email: string } }> {
@@ -44,13 +80,20 @@ export class AuthService {
       : existingEmailUser
         ? await this.prisma.user.update({ where: { id: existingEmailUser.id }, data: { googleSubject: payload.sub } })
         : await this.prisma.user.create({ data: { email, googleSubject: payload.sub } });
-    const token = await this.jwt.signAsync({ sub: user.id, email: user.email }, { expiresIn: '7d' });
-    return { token, user: { id: user.id, email: user.email } };
+    return this.issueSession(user);
   }
 
   async currentUser(userId: string): Promise<{ id: string; email: string; hasProfile: boolean }> {
     const user = await this.prisma.user.findUnique({ where: { id: userId }, include: { profile: { select: { id: true } } } });
     if (!user) throw new UnauthorizedException({ code: 'INVALID_SESSION', message: 'Sign in again to continue.' });
     return { id: user.id, email: user.email, hasProfile: Boolean(user.profile) };
+  }
+
+  getCookieName(): string {
+    return COOKIE_NAME;
+  }
+
+  getCookieOptions(): Record<string, unknown> {
+    return this.cookieOptions();
   }
 }

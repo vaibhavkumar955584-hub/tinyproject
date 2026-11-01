@@ -27,6 +27,7 @@
     "db:deploy": "pnpm --filter @tenderguard/api exec prisma migrate deploy",
     "db:seed": "pnpm --filter @tenderguard/api prisma:seed",
     "db:studio": "pnpm --filter @tenderguard/api prisma:studio",
+    "agent:probe": "pnpm --filter @tenderguard/api exec tsx scripts/probe.ts",
     "format": "prettier --write ."
   },
   "devDependencies": {

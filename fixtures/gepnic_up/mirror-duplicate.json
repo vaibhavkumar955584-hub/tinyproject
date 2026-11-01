@@ -1,0 +1,21 @@
+{
+  "source": "GEPNIC",
+  "portalId": "GEPNIC_UP",
+  "sourceTenderId": "DEMO-CPPP-001",
+  "url": "https://etender.up.nic.in/tenders/demo-cppp-001-mirror",
+  "title": "Demo: Managed IT helpdesk and endpoint support (UP State Mirror)",
+  "department": "Demo Public Works Department",
+  "location": "Uttar Pradesh",
+  "estimatedValueInr": 12000000,
+  "emdInr": 50000,
+  "publishedAt": "2026-10-20T09:00:00.000Z",
+  "closingAt": "2026-12-20T10:00:00.000Z",
+  "requirements": [
+    {
+      "type": "TURNOVER",
+      "valueJson": { "minimumInr": 1500000 },
+      "sourceQuote": "The bidder shall have average annual turnover of at least Rs. 15 lakh during the last three financial years."
+    }
+  ],
+  "rawText": "DEMO FIXTURE — Mirror notice published on GePNIC UP portal for Managed IT helpdesk and endpoint support. The bidder shall have average annual turnover of at least Rs. 15 lakh during the last three financial years."
+}

@@ -1,9 +1,13 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { ImageService } from '../images/image.service';
 
 @Injectable()
 export class TendersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly images: ImageService,
+  ) {}
 
   async detail(userId: string, tenderId: string) {
     const profile = await this.prisma.businessProfile.findUnique({ where: { userId }, select: { id: true } });
@@ -18,6 +22,14 @@ export class TendersService {
     });
     if (!tender) throw new NotFoundException({ code: 'TENDER_NOT_FOUND', message: 'Tender was not found.' });
     const { verdicts, watches, estimatedValueInr, emdInr, ...rest } = tender;
-    return { ...rest, estimatedValueInr: estimatedValueInr?.toString() ?? null, emdInr: emdInr?.toString() ?? null, verdict: verdicts[0] ?? null, watch: watches[0] ?? null };
+    const image = this.images.resolveImage(tender);
+    return {
+      ...rest,
+      estimatedValueInr: estimatedValueInr?.toString() ?? null,
+      emdInr: emdInr?.toString() ?? null,
+      verdict: verdicts[0] ?? null,
+      watch: watches[0] ?? null,
+      image,
+    };
   }
 }

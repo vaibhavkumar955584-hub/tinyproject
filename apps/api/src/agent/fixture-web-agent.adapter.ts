@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import { readFile, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { z } from 'zod';
+import { tenderSourceSchema, type TenderSource } from '@tenderguard/shared';
 import type { RawTender, SearchQuery, TenderRef, WebAgentPort } from './web-agent.port';
 
 const fixtureSchema = z.object({
-  source: z.enum(['CPPP', 'GEM']),
+  source: tenderSourceSchema,
+  portalId: z.string().optional(),
   sourceTenderId: z.string(),
   url: z.string().url(),
   title: z.string(),
@@ -26,14 +28,25 @@ export class FixtureWebAgent implements WebAgentPort {
   async discover(input: SearchQuery): Promise<TenderRef[]> {
     const fixtures = await this.loadAll();
     return fixtures
-      .filter((fixture) => input.sources.includes(fixture.source))
+      .filter((fixture) => input.sources.length === 0 || input.sources.includes(fixture.source as TenderSource))
       .filter((fixture) => {
         const haystack = `${fixture.title} ${fixture.department ?? ''} ${fixture.location ?? ''} ${fixture.rawText}`.toLowerCase();
-        const terms = input.query.toLowerCase().split(/\s+/).filter((word) => word.length > 3);
+        const terms = input.query.toLowerCase().split(/\s+/).filter((word) => word.length > 2);
         return terms.length === 0 || terms.some((word) => haystack.includes(word)) || fixture.sourceTenderId.startsWith('DEMO-');
       })
-      .slice(0, 10)
-      .map(({ source, sourceTenderId, url, title, department, location, estimatedValueInr, emdInr, publishedAt, closingAt }) => ({ source, sourceTenderId, url, titleHint: title, department, location, estimatedValueInr, emdInr, publishedAt, closingAt }));
+      .slice(0, 15)
+      .map(({ source, sourceTenderId, url, title, department, location, estimatedValueInr, emdInr, publishedAt, closingAt }) => ({
+        source: source as TenderSource,
+        sourceTenderId,
+        url,
+        titleHint: title,
+        department,
+        location,
+        estimatedValueInr,
+        emdInr,
+        publishedAt,
+        closingAt,
+      }));
   }
 
   async fetchDetails(ref: TenderRef): Promise<RawTender> {
@@ -42,7 +55,7 @@ export class FixtureWebAgent implements WebAgentPort {
     return { ...ref, title: fixture.title, rawText: fixture.rawText, fetchStatus: 'OK', department: fixture.department, location: fixture.location, estimatedValueInr: fixture.estimatedValueInr, emdInr: fixture.emdInr, publishedAt: fixture.publishedAt, closingAt: fixture.closingAt, fixtureRequirements: fixture.requirements };
   }
 
-  private async loadAll() {
+  private async loadAll(): Promise<Array<z.infer<typeof fixtureSchema>>> {
     const files = await this.findJsonFiles(this.fixtureDirectory);
     const entries = await Promise.all(files.map(async (file) => fixtureSchema.parse(JSON.parse(await readFile(file, 'utf8')))));
     return entries;

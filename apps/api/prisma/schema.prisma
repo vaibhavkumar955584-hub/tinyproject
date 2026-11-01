@@ -5,101 +5,64 @@ generator client {
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
-  directUrl = env("DATABASE_URL_UNPOOLED")
-}
-
-enum MsmeStatus {
-  NONE
-  MICRO
-  SMALL
-  MEDIUM
-}
-enum SearchStatus {
-  QUEUED
-  RUNNING
-  DONE
-  FAILED
-}
-enum TenderSource {
-  CPPP
-  GEM
-}
-enum FetchStatus {
-  OK
-  FETCH_FAILED
-  NEEDS_MANUAL_STEP
-}
-enum RequirementType {
-  TURNOVER
-  EXPERIENCE
-  EMD
-  DOCUMENT
-  LOCATION
-  CERTIFICATION
-  OTHER
-}
-enum VerdictType {
-  BID
-  RISKY
-  DONT_BID
-}
-enum AlertChangeType {
-  DEADLINE
-  EMD
-  CONDITION
-  OTHER
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-  id             String            @id @default(cuid())
-  email          String            @unique
+  id             String           @id @default(cuid())
+  email          String           @unique
   passwordHash   String?
-  googleSubject  String?           @unique
   telegramChatId String?
-  createdAt      DateTime          @default(now())
+  createdAt      DateTime         @default(now())
+  googleSubject  String?          @unique
+  alerts         Alert[]
   profile        BusinessProfile?
   watches        Watch[]
-  alerts         Alert[]
+
   @@map("users")
 }
 
 model BusinessProfile {
-  id                  String       @id @default(cuid())
-  userId              String       @unique
-  category            String
-  state               String
-  annualTurnoverInr   BigInt
-  experienceYears     Int
-  msmeStatus          MsmeStatus   @default(NONE)
-  certifications      String[]
-  documentsHeld       String[]
-  updatedAt           DateTime     @updatedAt
-  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-  searchJobs          SearchJob[]
-  verdicts            Verdict[]
+  id                String      @id @default(cuid())
+  userId            String      @unique
+  category          String
+  state             String
+  annualTurnoverInr BigInt
+  experienceYears   Int
+  msmeStatus        MsmeStatus  @default(NONE)
+  certifications    String[]
+  documentsHeld     String[]
+  updatedAt         DateTime    @updatedAt
+  user              User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  searchJobs        SearchJob[]
+  verdicts          Verdict[]
+
   @@map("business_profiles")
 }
 
 model SearchJob {
-  id         String        @id @default(cuid())
+  id         String            @id @default(cuid())
   profileId  String
   query      String
-  status     SearchStatus  @default(QUEUED)
-  progress   Int           @default(0)
-  createdAt  DateTime      @default(now())
+  status     SearchStatus      @default(QUEUED)
+  progress   Int               @default(0)
+  streamingUrl String?
+  createdAt  DateTime          @default(now())
   finishedAt DateTime?
-  profile    BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
-  tenders    SearchJobTender[]
   logs       AgentLog[]
+  tenders    SearchJobTender[]
+  runs       TinyFishRun[]
+  profile    BusinessProfile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
   @@index([profileId, createdAt])
   @@map("search_jobs")
 }
 
 model Tender {
-  id                String          @id @default(cuid())
+  id                String            @id @default(cuid())
   source            TenderSource
   sourceTenderId    String
-  url               String          @unique
+  url               String            @unique
   title             String
   department        String?
   location          String?
@@ -107,45 +70,60 @@ model Tender {
   emdInr            BigInt?
   publishedAt       DateTime?
   closingAt         DateTime?
-  rawText           String          @db.Text
+  rawText           String
   contentHash       String
-  lastFetchedAt     DateTime        @default(now())
-  fetchStatus       FetchStatus     @default(OK)
-  requirements      Requirement[]
-  verdicts          Verdict[]
-  jobs              SearchJobTender[]
-  watches           Watch[]
-  snapshots         Snapshot[]
+  lastFetchedAt     DateTime          @default(now())
+  fetchStatus       FetchStatus       @default(OK)
+  imageUrl          String?
+  thumbUrl          String?
+  imageSource       TenderImageSource?
+  imageCapturedAt   DateTime?
+  imageWidth        Int?
+  imageHeight       Int?
+  portalId          String?
+  alsoOn            String[]          @default([])
+  relevance         Int?              @default(50)
+  whyMatched        String?
   alerts            Alert[]
+  requirements      Requirement[]
+  jobs              SearchJobTender[]
+  snapshots         Snapshot[]
+  verdicts          Verdict[]
+  watches           Watch[]
+
   @@unique([source, sourceTenderId])
   @@index([closingAt])
   @@map("tenders")
 }
 
 model Requirement {
-  id          String           @id @default(cuid())
+  id          String          @id @default(cuid())
   tenderId    String
   type        RequirementType
   valueJson   Json
-  sourceUrl   String
-  sourceQuote String           @db.Text
-  confidence  Float
-  tender      Tender           @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  sourceUrl     String
+  sourceQuote      String
+  screenshotUrl    String?
+  evidenceImageUrl String?
+  confidence       Float
+  tender      Tender          @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
   @@index([tenderId, type])
   @@map("requirements")
 }
 
 model Verdict {
-  id         String       @id @default(cuid())
-  tenderId   String
-  profileId  String
-  verdict    VerdictType
-  score      Int
-  reasons    Json
-  checklist  Json
-  createdAt  DateTime     @default(now())
-  tender     Tender       @relation(fields: [tenderId], references: [id], onDelete: Cascade)
-  profile    BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  id        String          @id @default(cuid())
+  tenderId  String
+  profileId String
+  verdict   VerdictType
+  score     Int
+  reasons   Json
+  checklist Json
+  createdAt DateTime        @default(now())
+  profile   BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tender    Tender          @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
   @@unique([tenderId, profileId])
   @@map("verdicts")
 }
@@ -155,19 +133,21 @@ model SearchJobTender {
   tenderId String
   job      SearchJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
   tender   Tender    @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
   @@id([jobId, tenderId])
   @@map("search_job_tenders")
 }
 
 model Watch {
-  id            String   @id @default(cuid())
+  id            String    @id @default(cuid())
   userId        String
   tenderId      String
-  intervalHours Int      @default(6)
-  active        Boolean  @default(true)
+  intervalHours Int       @default(6)
+  active        Boolean   @default(true)
   lastCheckedAt DateTime?
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tender        Tender   @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  tender        Tender    @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@unique([userId, tenderId])
   @@index([active, lastCheckedAt])
   @@map("watches")
@@ -180,6 +160,7 @@ model Snapshot {
   fieldsJson  Json
   takenAt     DateTime @default(now())
   tender      Tender   @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+
   @@index([tenderId, takenAt])
   @@map("snapshots")
 }
@@ -195,19 +176,120 @@ model Alert {
   verdictAfter  String?
   sentAt        DateTime?
   createdAt     DateTime        @default(now())
-  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   tender        Tender          @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+
   @@index([userId, createdAt])
   @@map("alerts")
 }
 
 model AgentLog {
-  id        String   @id @default(cuid())
-  jobId     String
-  step      String
-  detail    String
-  ts        DateTime @default(now())
-  job       SearchJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  id     String    @id @default(cuid())
+  jobId  String
+  step   String
+  detail String
+  ts     DateTime  @default(now())
+  job    SearchJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
   @@index([jobId, ts])
   @@map("agent_logs")
+}
+
+enum MsmeStatus {
+  NONE
+  MICRO
+  SMALL
+  MEDIUM
+}
+
+enum SearchStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+  CANCELLED
+}
+
+enum TenderSource {
+  CPPP
+  GEM
+  GEPNIC
+  IREPS
+  DEFENCE
+  PSU
+  CUSTOM
+}
+
+enum FetchStatus {
+  OK
+  FETCH_FAILED
+  NEEDS_MANUAL_STEP
+}
+
+enum RequirementType {
+  TURNOVER
+  EXPERIENCE
+  EMD
+  DOCUMENT
+  LOCATION
+  CERTIFICATION
+  OTHER
+}
+
+enum VerdictType {
+  BID
+  RISKY
+  DONT_BID
+}
+
+enum AlertChangeType {
+  DEADLINE
+  EMD
+  CONDITION
+  OTHER
+}
+
+enum TenderImageSource {
+  SCREENSHOT
+  ORG_BADGE
+  CATEGORY_ICON
+}
+
+model TinyFishRun {
+  id           String       @id @default(cuid())
+  runId        String       @unique
+  jobId        String?
+  portal       TenderSource
+  goal         String
+  status       String       @default("PENDING")
+  streamingUrl String?
+  stepsCount   Int          @default(0)
+  resultJson   Json?
+  errorJson    Json?
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  job          SearchJob?   @relation(fields: [jobId], references: [id], onDelete: SetNull)
+
+  @@index([jobId, portal])
+  @@index([status])
+  @@map("tinyfish_runs")
+}
+
+model PortalHealth {
+  id                  String    @id @default(cuid())
+  portalId            String    @unique
+  successCount        Int       @default(0)
+  failureCount        Int       @default(0)
+  consecutiveFailures Int       @default(0)
+  lastSuccessAt       DateTime?
+  lastFailureAt       DateTime?
+  lastError           String?
+  avgLatencyMs        Int       @default(0)
+  circuitOpenUntil    DateTime?
+  updatedAt           DateTime  @updatedAt
+
+  @@map("portal_health")
 }

@@ -13,6 +13,7 @@ import { TendersModule } from './tenders/tenders.module';
 import { WatchesModule } from './watches/watches.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { ImagesModule } from './images/images.module';
 import { PrismaService } from './prisma/prisma.service';
 
 @Controller('health')
@@ -20,9 +21,11 @@ class HealthController {
   constructor(private readonly prisma: PrismaService) {}
 
   @Get()
-  async getHealth(): Promise<{ status: 'ok'; database: 'ok' }> {
+  async getHealth(): Promise<{ status: string; database: string; queue: string; latencyMs: number; version: string }> {
+    const start = Date.now();
     await this.prisma.$queryRaw`SELECT 1`;
-    return { status: 'ok', database: 'ok' };
+    const latencyMs = Date.now() - start;
+    return { status: 'ok', database: 'ok', queue: 'ok', latencyMs, version: '1.0.0' };
   }
 }
 
@@ -39,6 +42,7 @@ class HealthController {
     WatchesModule,
     AlertsModule,
     NotificationsModule,
+    ImagesModule,
   ],
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],

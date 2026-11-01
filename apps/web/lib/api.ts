@@ -11,7 +11,11 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, {
     ...init,
     credentials: 'include',
-    headers: { 'content-type': 'application/json', ...init.headers },
+    headers: {
+      'content-type': 'application/json',
+      'x-requested-with': 'tenderguard',
+      ...init.headers,
+    },
     cache: 'no-store',
   });
   if (!response.ok) {
@@ -24,4 +28,12 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 
 export function apiBaseUrl(): string {
   return API_URL;
+}
+
+export function resolveImageUrl(url?: string | null): string {
+  if (!url) return '';
+  if (url.startsWith('http://') || url.startsWith('https://')) return url;
+  const base = API_URL.replace(/\/api\/?$/, '');
+  const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  return `${base}${cleanPath}`;
 }

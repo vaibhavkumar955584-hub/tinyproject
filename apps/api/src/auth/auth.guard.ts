@@ -12,7 +12,7 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>();
-    const cookie = request.cookies?.access_token as string | undefined;
+    const cookie = request.cookies?.tg_session as string | undefined;
     const authorization = request.headers.authorization;
     const bearer = authorization?.startsWith('Bearer ') ? authorization.slice(7) : undefined;
     const token = cookie ?? bearer;

@@ -1,0 +1,36 @@
+{
+  "source": "IREPS",
+  "portalId": "IREPS",
+  "sourceTenderId": "DEMO-IREPS-001",
+  "url": "https://ireps.gov.in/tenders/demo-ireps-001",
+  "title": "Demo: Railway Station Video Surveillance Network & High-Definition CCTV Cameras",
+  "department": "Indian Railways / Northern Railway",
+  "location": "New Delhi",
+  "estimatedValueInr": 8500000,
+  "emdInr": 170000,
+  "publishedAt": "2026-10-29T09:00:00.000Z",
+  "closingAt": "2026-12-10T15:30:00.000Z",
+  "requirements": [
+    {
+      "type": "TURNOVER",
+      "valueJson": { "minimumInr": 2500000 },
+      "sourceQuote": "Average annual financial turnover during the last 3 years should be at least Rs. 25 lakh."
+    },
+    {
+      "type": "EXPERIENCE",
+      "valueJson": { "minimumYears": 2 },
+      "sourceQuote": "Bidder must have completed at least one railway or airport video surveillance project."
+    },
+    {
+      "type": "CERTIFICATION",
+      "valueJson": { "name": "RDSO Approval / ISO 9001" },
+      "sourceQuote": "CCTV cameras and switches must comply with RDSO specifications and ISO 9001 certification."
+    },
+    {
+      "type": "EMD",
+      "valueJson": { "amountInr": 170000 },
+      "sourceQuote": "Earnest Money Deposit is Rs. 1,70,000 payable online via IREPS payment gateway."
+    }
+  ],
+  "rawText": "DEMO FIXTURE — IREPS Indian Railways Public Gazette. Railway Station Video Surveillance Network & High-Definition CCTV Cameras. Average annual financial turnover during the last 3 years should be at least Rs. 25 lakh. Bidder must have completed at least one railway or airport video surveillance project. CCTV cameras and switches must comply with RDSO specifications and ISO 9001 certification. Earnest Money Deposit is Rs. 1,70,000 payable online via IREPS payment gateway. Bids close on 10 December 2026 at 15:30 IST."
+}

@@ -3,62 +3,63 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 :root {
-  --canvas: #f7f5ef;
-  --paper: #fffefa;
-  --ink: #2b2926;
-  --muted: #777168;
-  --line: #e6e1d8;
-  --brown: #694d38;
-  --brown-dark: #4d382a;
-  --blue: #355a78;
-  --blue-soft: #e9f0f5;
-  --red: #b9473f;
-  --red-soft: #f8eae7;
-  --green: #3f7458;
-  --green-soft: #e9f2ec;
-  --sidebar: #f4f0e8;
-  --surface-muted: #f4f1ea;
-  --surface-hover: #f3f0e9;
-  --amber: #9a671e;
-  --amber-soft: #fbf0dc;
-  --amber-border: #ead5ad;
-  --green-border: #c3dbc9;
-  --red-border: #efc7c2;
-  --blue-border: #b9c8d2;
-  --muted-subtle: #bcb3a6;
+  --canvas: #FAF7F2;
+  --paper: #FFFFFF;
+  --ink: #2E2118;
+  --muted: #6B6259;
+  --line: #E8DED2;
+  --brown: #6B4226;
+  --brown-dark: #52311A;
+  --blue: #2B4E6B;
+  --blue-soft: #EAF0F5;
+  --red: #A83832;
+  --red-soft: #FAEDE9;
+  --green: #2F6B4F;
+  --green-soft: #EBF4EF;
+  --sidebar: #F3EEE6;
+  --surface-muted: #F6F1E9;
+  --surface-hover: #EFE8DD;
+  --amber: #94631A;
+  --amber-soft: #FAF2E2;
+  --amber-border: #E8D5B5;
+  --green-border: #BCD8C7;
+  --red-border: #ECC2BD;
+  --blue-border: #BDD0DF;
+  --muted-subtle: #A3998C;
   color-scheme: light;
 }
 
 .dark {
-  --canvas: #1c1814;
-  --paper: #24201c;
-  --ink: #efe5d8;
-  --muted: #a49d92;
-  --line: #3a342e;
-  --brown: #b19e84;
-  --brown-dark: #cbbba7;
-  --blue: #8fb3c9;
-  --blue-soft: #2a333d;
-  --red: #d99a92;
-  --red-soft: #3d2622;
-  --green: #8fc3a8;
-  --green-soft: #26332c;
-  --sidebar: #24201c;
-  --surface-muted: #2d2924;
-  --surface-hover: #2d2924;
-  --amber: #d7b872;
-  --amber-soft: #3d3020;
-  --amber-border: #574629;
-  --green-border: #315a42;
-  --red-border: #633a35;
-  --blue-border: #3b5263;
-  --muted-subtle: #817b72;
+  --canvas: #1A1613;
+  --paper: #221D19;
+  --ink: #F2EBE1;
+  --muted: #9E958A;
+  --line: #38312A;
+  --brown: #B8977E;
+  --brown-dark: #CCAFA0;
+  --blue: #8AB4CF;
+  --blue-soft: #242E38;
+  --red: #DE8F87;
+  --red-soft: #382421;
+  --green: #7BB896;
+  --green-soft: #202E26;
+  --sidebar: #1E1915;
+  --surface-muted: #28231E;
+  --surface-hover: #302A24;
+  --amber: #DEBA70;
+  --amber-soft: #332817;
+  --amber-border: #524024;
+  --green-border: #2D543D;
+  --red-border: #5C322D;
+  --blue-border: #334B5C;
+  --muted-subtle: #756D63;
   color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
-body { margin: 0; background: var(--canvas); color: var(--ink); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; transition: background-color 0.3s ease; }
+body { margin: 0; background: var(--canvas); color: var(--ink); font-family: var(--font-sans), Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; transition: background-color 0.3s ease; }
+.font-serif { font-family: var(--font-serif), "Fraunces", Georgia, Cambria, "Times New Roman", Times, serif; }
 button, input, textarea, select { font: inherit; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid #7397b2; outline-offset: 2px; }
 a { color: inherit; text-decoration: none; }
@@ -78,14 +79,20 @@ a { color: inherit; text-decoration: none; }
 .dark .btn-secondary { background: var(--paper); border-color: var(--line); }
 .dark .btn-secondary:hover { background: #2d2924; }
 .badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 9px; font-size: 11px; font-weight: 750; }
-.badge-bid { background: var(--green-soft); color: var(--green); }
-.badge-risk { background: var(--amber-soft); color: var(--amber); }
-.badge-dont { background: var(--red-soft); color: var(--red); }
-.badge-blue { background: var(--blue-soft); color: var(--blue); }
+.badge-bid { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-border); }
+.badge-risk { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-dont { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-border); }
+.badge-blue { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--blue-border); }
+.badge-match-strong { background: var(--green-soft); color: var(--green); border: 1px solid var(--green-border); }
+.badge-match-potential { background: var(--amber-soft); color: var(--amber); border: 1px solid var(--amber-border); }
+.badge-match-low { background: var(--red-soft); color: var(--red); border: 1px solid var(--red-border); }
 .dark .badge-bid { background: var(--green-soft); color: var(--green); }
 .dark .badge-risk { background: var(--amber-soft); color: var(--amber); }
 .dark .badge-dont { background: var(--red-soft); color: var(--red); }
 .dark .badge-blue { background: var(--blue-soft); color: var(--blue); }
+.dark .badge-match-strong { background: var(--green-soft); color: var(--green); }
+.dark .badge-match-potential { background: var(--amber-soft); color: var(--amber); }
+.dark .badge-match-low { background: var(--red-soft); color: var(--red); }
 
 /* Keep existing route-level Tailwind color classes aligned with theme tokens. */
 .dark [class~="bg-[#fffefa]"] { background-color: var(--paper) !important; }
