@@ -4,6 +4,7 @@ export const envSchema = z.object({
   DATABASE_URL: z.string().url().default('postgresql://tenderguard:tenderguard_dev@localhost:5432/tenderguard?schema=public'),
   JWT_SECRET: z.string().min(32).default('local-development-secret-change-before-deploy'),
   GOOGLE_CLIENT_ID: z.string().optional(),
+  GOOGLE_CLIENT_SECRET: z.string().optional(),
   WEB_ORIGIN: z.string().url().default('http://localhost:3000'),
   API_PORT: z.coerce.number().int().min(1).max(65535).default(4000),
   AGENT_MODE: z.enum(['live', 'fixture']).default('fixture'),

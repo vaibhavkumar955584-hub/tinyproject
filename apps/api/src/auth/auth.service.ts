@@ -6,16 +6,22 @@ import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  private readonly googleClient = new OAuth2Client();
-
   constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService, private readonly config: ConfigService) {}
 
-  async signInWithGoogle(credential: string): Promise<{ token: string; user: { id: string; email: string } }> {
+  private createGoogleClient(): { client: OAuth2Client; clientId: string } {
     const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
-    if (!clientId) throw new ServiceUnavailableException({ code: 'GOOGLE_AUTH_NOT_CONFIGURED', message: 'Google sign-in is not configured yet.' });
+    const clientSecret = this.config.get<string>('GOOGLE_CLIENT_SECRET');
+    if (!clientId || !clientSecret) throw new ServiceUnavailableException({ code: 'GOOGLE_AUTH_NOT_CONFIGURED', message: 'Google sign-in is not configured yet.' });
+    return { client: new OAuth2Client(clientId, clientSecret, this.config.getOrThrow<string>('WEB_ORIGIN')), clientId };
+  }
+
+  async signInWithGoogleCode(code: string): Promise<{ token: string; user: { id: string; email: string } }> {
+    const { client, clientId } = this.createGoogleClient();
     let payload;
     try {
-      const ticket = await this.googleClient.verifyIdToken({ idToken: credential, audience: clientId });
+      const { tokens } = await client.getToken(code);
+      if (!tokens.id_token) throw new Error('Google did not return an ID token.');
+      const ticket = await client.verifyIdToken({ idToken: tokens.id_token, audience: clientId });
       payload = ticket.getPayload();
     } catch {
       throw new UnauthorizedException({ code: 'INVALID_GOOGLE_CREDENTIAL', message: 'Google could not verify this sign-in. Please try again.' });

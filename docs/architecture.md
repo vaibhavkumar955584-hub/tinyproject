@@ -22,7 +22,7 @@ Neon PostgreSQL stores profiles, jobs, public tender text, evidence, verdicts, w
 
 ## Authentication
 
-Google Identity Services is the only sign-in and sign-up provider. The web app posts Google's ID token to `POST /api/auth/google`; the API verifies its signature and `GOOGLE_CLIENT_ID` audience, requires a verified email, then issues a seven-day HTTP-only JWT cookie. New accounts are keyed by Google's stable `sub`; verified email can link a legacy account once. A short-lived double-submit CSRF cookie protects the credential exchange. Configure the same OAuth web client ID as `GOOGLE_CLIENT_ID` in the API and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in the web app. The Google client secret is not used by this flow.
+Google Identity Services is the only sign-in and sign-up provider. The browser requests an OAuth authorization code in popup mode and posts it to `POST /api/auth/google` with a short-lived double-submit CSRF token and the required `X-Requested-With` header. The API exchanges the code using server-only `GOOGLE_CLIENT_SECRET`, verifies the resulting ID token against `GOOGLE_CLIENT_ID`, requires a verified email, then issues a seven-day HTTP-only JWT cookie. New accounts are keyed by Google's stable `sub`; verified email can link a legacy account once. Configure the same OAuth web client ID as `GOOGLE_CLIENT_ID` in the API and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in the web app; never expose the secret to the browser.
 
 ## Local services
 

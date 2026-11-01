@@ -21,7 +21,7 @@ pnpm dev
 
 Open `http://localhost:3000`. API health is at `http://localhost:4000/api/health`. Mailpit inbox is at `http://localhost:8025`.
 
-Authentication is Google-only. Set `GOOGLE_CLIENT_ID` for the API and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` for the web app to the same Google OAuth **web client ID**. In Google Cloud Console, add the app origin (for local development, `http://localhost:3000`) to the OAuth client's authorized JavaScript origins, and add the intended users to the OAuth consent screen's test-user list while the app is in testing. The API verifies Google's ID token before creating or linking a TenderGuard account; no Google client secret is used by this flow. Never commit a downloaded OAuth client JSON file.
+Authentication is Google-only. Set `GOOGLE_CLIENT_ID` and the server-only `GOOGLE_CLIENT_SECRET` for the API, plus `NEXT_PUBLIC_GOOGLE_CLIENT_ID` for the web app, using the same Google OAuth **web client**. In Google Cloud Console, add the app origin (for local development, `http://localhost:3000`) to the OAuth client's authorized JavaScript origins, and add intended users to the OAuth consent screen's test-user list while the app is in testing. The browser requests an authorization code; the API exchanges it using the server-side secret and verifies the resulting ID token before creating or linking a TenderGuard account. Never commit a downloaded OAuth client JSON file or expose the secret in a `NEXT_PUBLIC_*` variable.
 
 The seed command adds a demo business profile to the database, but no demo password exists. Sign in with a real Google account to access the app. Fixture mode is the default and requires no external AI API keys.
 

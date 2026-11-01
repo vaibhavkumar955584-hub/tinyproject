@@ -28,15 +28,15 @@ export class AuthController {
   @Post('google')
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   async google(@Body() body: unknown, @Req() request: Request, @Res({ passthrough: true }) response: Response) {
-    const input = body as { credential?: unknown; csrfToken?: unknown } | null;
+    const input = body as { code?: unknown; csrfToken?: unknown } | null;
     const cookieToken = request.cookies?.google_auth_csrf;
-    if (typeof input?.csrfToken !== 'string' || typeof cookieToken !== 'string' || input.csrfToken !== cookieToken) {
+    if (request.header('x-requested-with') !== 'XmlHttpRequest' || typeof input?.csrfToken !== 'string' || typeof cookieToken !== 'string' || input.csrfToken !== cookieToken) {
       throw new BadRequestException({ code: 'INVALID_CSRF_TOKEN', message: 'Google sign-in could not be verified. Please try again.' });
     }
-    if (typeof input.credential !== 'string' || input.credential.length > 10_000) {
-      throw new BadRequestException({ code: 'INVALID_GOOGLE_CREDENTIAL', message: 'Google sign-in returned an invalid credential.' });
+    if (typeof input.code !== 'string' || input.code.length > 2_000) {
+      throw new BadRequestException({ code: 'INVALID_GOOGLE_CODE', message: 'Google sign-in returned an invalid authorization code.' });
     }
-    const result = await this.auth.signInWithGoogle(input.credential);
+    const result = await this.auth.signInWithGoogleCode(input.code);
     response.cookie('access_token', result.token, cookieOptions);
     return { user: result.user };
   }
