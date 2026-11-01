@@ -95,6 +95,6 @@ export class WatchMonitor {
       await tx.watch.update({ where: { id: watch.id }, data: { lastCheckedAt: new Date() } });
       return ids;
     });
-    await Promise.all(alertIds.map((alertId) => this.notifications.notifyAlert(alertId)));
+    await Promise.all(alertIds.map((alertId: string) => this.notifications.notifyAlert(alertId)));
   }
 }
