@@ -1,4 +1,12 @@
 import 'reflect-metadata';
+
+// Sanitize critical environment variables by stripping surrounding quotes
+['DATABASE_URL', 'DIRECT_URL', 'DATABASE_URL_UNPOOLED', 'JWT_SECRET', 'TINYFISH_API_KEY'].forEach((key) => {
+  if (process.env[key]) {
+    process.env[key] = process.env[key]!.trim().replace(/^["']|["']$/g, '');
+  }
+});
+
 import { NestFactory } from '@nestjs/core';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';

@@ -31,7 +31,16 @@ class HealthController {
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, envFilePath: [resolve(process.cwd(), '.env.local'), resolve(process.cwd(), '.env'), resolve(process.cwd(), '../../.env.local'), resolve(process.cwd(), '../../.env')], validate: (config) => parseEnv(config) }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: [resolve(process.cwd(), '.env.local'), resolve(process.cwd(), '.env'), resolve(process.cwd(), '../../.env.local'), resolve(process.cwd(), '../../.env')],
+      validate: (config) => {
+        const parsed = parseEnv(config);
+        if (parsed.DATABASE_URL) process.env.DATABASE_URL = parsed.DATABASE_URL;
+        if (parsed.DIRECT_URL) process.env.DIRECT_URL = parsed.DIRECT_URL;
+        return parsed;
+      },
+    }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60 }]),
     ScheduleModule.forRoot(),
     PrismaModule,
