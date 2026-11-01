@@ -1,10 +1,10 @@
 CREATE TYPE "MsmeStatus" AS ENUM ('NONE', 'MICRO', 'SMALL', 'MEDIUM');
 
 -- CreateEnum
-CREATE TYPE "SearchStatus" AS ENUM ('QUEUED', 'RUNNING', 'DONE', 'FAILED');
+CREATE TYPE "SearchStatus" AS ENUM ('QUEUED', 'RUNNING', 'DONE', 'FAILED', 'CANCELLED');
 
 -- CreateEnum
-CREATE TYPE "TenderSource" AS ENUM ('CPPP', 'GEM');
+CREATE TYPE "TenderSource" AS ENUM ('CPPP', 'GEM', 'GEPNIC', 'IREPS', 'DEFENCE', 'PSU', 'CUSTOM');
 
 -- CreateEnum
 CREATE TYPE "FetchStatus" AS ENUM ('OK', 'FETCH_FAILED', 'NEEDS_MANUAL_STEP');
@@ -241,3 +241,4 @@ ALTER TABLE "alerts" ADD CONSTRAINT "alerts_tenderId_fkey" FOREIGN KEY ("tenderI
 
 -- AddForeignKey
 ALTER TABLE "agent_logs" ADD CONSTRAINT "agent_logs_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "search_jobs"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
