@@ -12,7 +12,7 @@ export default defineConfig({
     ...devices['Desktop Chrome'],
   },
   webServer: {
-    command: process.env.CI ? 'pnpm --filter @tenderguard/web start' : 'pnpm --filter @tenderguard/web dev',
+    command: 'pnpm --filter @tenderguard/web dev',
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
