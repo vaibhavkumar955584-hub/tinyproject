@@ -3,7 +3,7 @@
   "services": {
     "api": {
       "root": "apps/api",
-      "framework": "nestjs"
+      "entrypoint": "dist/main.js"
     },
     "web": {
       "root": "apps/web",

@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
-    "build": "pnpm --filter @tenderguard/shared build && prisma generate && nest build",
+    "build": "pnpm --filter @tenderguard/shared build && prisma generate && nest build && ncc build dist/main.js -o dist/bundled -e @prisma/client -e argon2 -e sharp -e pg-boss && node -e \"const fs=require('fs'); fs.copyFileSync('dist/bundled/index.js','dist/main.js');\"",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "test": "jest --runInBand --passWithNoTests",
@@ -48,6 +48,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^22.16.5",
     "@types/nodemailer": "^6.4.17",
+    "@vercel/ncc": "^0.45.0",
     "jest": "^30.0.4",
     "ts-jest": "^29.4.0",
     "tsx": "^4.20.3",
