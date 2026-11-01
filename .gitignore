@@ -19,3 +19,5 @@ coverage/
 /.codex/skills/
 /.21st/skills.lock
 apps/web/public/brand/preview.png
+.vercel
+.env*
