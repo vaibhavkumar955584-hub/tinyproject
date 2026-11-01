@@ -51,7 +51,7 @@ Extract the official tender document details:
     } catch {}
 
     if (rawText) {
-      const match = rawText.match(/Tender\s*(?:ID|Ref(?:erence)?\s*(?:No|Number)?)\s*[:\-]?\s*([A-Za-z0-9_\-\/]{6,35})/i);
+      const match = rawText.match(/Tender\s*(?:ID|Ref(?:erence)?\s*(?:No|Number)?)\s*[:-]?\s*([A-Za-z0-9_/-]{6,35})/i);
       if (match && match[1]) return match[1].trim();
     }
 
