@@ -18,9 +18,16 @@ export interface ProcessedImageResult {
 @Injectable()
 export class ImageService {
   private readonly logger = new Logger(ImageService.name);
-  private readonly storageDir = path.resolve(process.cwd(), 'uploads/images');
+  private readonly storageDir: string;
 
   constructor(private readonly config: ConfigService) {
+    const defaultDir = path.resolve(process.cwd(), 'uploads/images');
+    const candidateDirs = [
+      defaultDir,
+      path.resolve(process.cwd(), 'apps/api/uploads/images'),
+      path.resolve(__dirname, '../../uploads/images'),
+    ];
+    this.storageDir = candidateDirs.find((d) => existsSync(d)) ?? defaultDir;
     void this.initStorage();
   }
 
