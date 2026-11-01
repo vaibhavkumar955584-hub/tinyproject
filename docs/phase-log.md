@@ -12,7 +12,7 @@ The user explicitly asked to complete every phase without the original phase-by-
 
 ## Phase 2 — Evidence and eligibility brain
 
-**Status:** Implemented. Includes shared deterministic eligibility logic, quote normalization/verification, Gemini/OpenAI JSON extraction adapters with one repair attempt, and fixtures targeting BID/RISKY/DONT_BID. Automated unit coverage currently has seven shared tests; deeper coverage remains a hardening item.
+**Status:** Implemented. Includes shared deterministic eligibility logic, quote normalization/verification, Gemini/OpenAI JSON extraction adapters with one repair attempt, and fixtures targeting BID/RISKY/DONT_BID. Twelve shared unit tests cover the environment and eligibility logic.
 
 ## Phase 3 — Search agent
 
@@ -32,12 +32,14 @@ The user explicitly asked to complete every phase without the original phase-by-
 
 ## Phase 7 — Hardening
 
-**Status:** Strict typecheck, lint, shared tests (including >90% eligibility coverage), and web/API production builds pass. GitHub Actions CI is included. Full API/browser smoke and database checks require Docker/Postgres.
+**Status:** Strict typecheck, lint, shared unit tests, 90% coverage thresholds, and web/API production builds pass. GitHub Actions CI runs migration, seed, and the browser smoke flow on Postgres. The browser run could not execute locally because Docker/Postgres is unavailable.
 
 ## Current verification
 
 - `pnpm typecheck`: passed.
 - `pnpm lint`: passed.
-- `pnpm test`: passed (7 shared tests; API/web suites have no tests yet).
+- `pnpm test`: passed (12 shared tests; API/web unit suites currently have no tests).
+- `pnpm test:coverage`: passed (100% statements/lines/functions and 93.27% branches for eligibility).
+- `pnpm exec playwright test --list`: passed (one login → search → evidence smoke test discovered).
 - `pnpm build`: passed (Next.js and NestJS production builds).
 - `pnpm db:up`: blocked because the Docker Desktop Linux engine was unavailable; migration, seed, and end-to-end flows could not be exercised in this environment.

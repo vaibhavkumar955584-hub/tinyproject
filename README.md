@@ -56,6 +56,8 @@ See [architecture](docs/architecture.md), [UI design notes](docs/ui-design.md), 
 | `pnpm lint` | Run ESLint |
 | `pnpm typecheck` | Run TypeScript checks |
 | `pnpm test` | Run shared/API/web unit tests |
+| `pnpm test:coverage` | Enforce 90% eligibility coverage thresholds |
+| `pnpm test:e2e` | Run the Playwright demo login → search → evidence smoke flow |
 | `pnpm db:up` / `pnpm db:down` | Start/stop Postgres |
 | `pnpm db:migrate` | Apply Prisma migrations |
 | `pnpm db:seed` | Create demo profile and user |
@@ -69,6 +71,6 @@ For deployment, use a managed PostgreSQL instance and separate web/API deploymen
 
 ## Current limitations
 
-- API and browser end-to-end smoke tests are not yet present; current tests focus on shared eligibility and environment validation.
+- The Playwright smoke test is wired into CI. Running it locally requires Postgres, migrations, the demo seed, and Chromium (`pnpm exec playwright install chromium`).
 - Live portal search and notification delivery need real credentials and a running database for end-to-end verification.
 - Database migration/seed and full local run require Docker. Check [the phase log](docs/phase-log.md) for verification results and known gaps.
