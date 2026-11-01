@@ -1,6 +1,6 @@
 import { Body, Controller, Post, Query, Req, Sse, UseGuards } from '@nestjs/common';
 import { Observable, map } from 'rxjs';
-import { AuthGuard, AuthenticatedRequest } from '../auth/auth.guard';
+import { AuthGuard, type AuthenticatedRequest } from '../auth/auth.guard';
 import { TinyFishService } from './tinyfish.service';
 import { z } from 'zod';
 

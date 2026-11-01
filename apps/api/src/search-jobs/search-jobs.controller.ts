@@ -2,7 +2,7 @@ import { Body, Controller, Get, Headers, MessageEvent, Param, Post, Query, Req, 
 import { searchInputSchema } from '@tenderguard/shared';
 import { Throttle } from '@nestjs/throttler';
 import { Observable } from 'rxjs';
-import { AuthGuard, AuthenticatedRequest } from '../auth/auth.guard';
+import { AuthGuard, type AuthenticatedRequest } from '../auth/auth.guard';
 import { SearchJobsService } from './search-jobs.service';
 
 @Controller('search-jobs')

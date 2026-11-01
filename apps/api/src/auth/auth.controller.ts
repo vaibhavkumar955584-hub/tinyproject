@@ -2,7 +2,7 @@ import { BadRequestException, Body, Controller, Get, Post, Req, Res, UseGuards }
 import { randomBytes } from 'node:crypto';
 import type { Request, Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
-import { AuthenticatedRequest, AuthGuard } from './auth.guard';
+import { type AuthenticatedRequest, AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 const csrfCookieOptions = {
