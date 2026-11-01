@@ -1294,12 +1294,11 @@ export default function SearchPage() {
                           className="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105"
                           onError={(e) => {
                             const target = e.currentTarget;
-                            const fallbackBadge = resolveImageUrl(
+                            if (target.dataset.failed) return;
+                            target.dataset.failed = 'true';
+                            target.src = resolveImageUrl(
                               `/api/images/badges/${encodeURIComponent(tender.source)}.svg`
                             );
-                            if (target.src !== fallbackBadge) {
-                              target.src = fallbackBadge;
-                            }
                           }}
                         />
                         {/* Hover overlay hint */}

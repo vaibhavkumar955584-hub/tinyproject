@@ -2,8 +2,8 @@ function getApiUrl(): string {
   if (typeof window === 'undefined' && process.env.API_URL_INTERNAL) {
     return `${process.env.API_URL_INTERNAL.replace(/\/$/, '')}/api`;
   }
-  if (typeof window !== 'undefined' && !process.env.NEXT_PUBLIC_API_URL && window.location.hostname !== 'localhost') {
-    return '/api';
+  if (typeof window !== 'undefined') {
+    return process.env.NEXT_PUBLIC_API_URL || '/api';
   }
   return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 }
@@ -44,6 +44,9 @@ export function resolveImageUrl(url?: string | null): string {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
   const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  if (typeof window !== 'undefined') {
+    return cleanPath;
+  }
   const apiUrl = getApiUrl();
   if (apiUrl.startsWith('/')) {
     return cleanPath;

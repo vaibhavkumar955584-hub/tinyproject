@@ -30,6 +30,9 @@
     "agent:probe": "pnpm --filter @tenderguard/api exec tsx scripts/probe.ts",
     "format": "prettier --write ."
   },
+  "dependencies": {
+    "reflect-metadata": "^0.2.2"
+  },
   "devDependencies": {
     "@eslint/js": "^9.29.0",
     "@neon/config": "^1.10.0",
