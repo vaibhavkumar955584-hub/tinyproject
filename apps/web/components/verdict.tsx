@@ -14,6 +14,6 @@ export function VerdictBadge({ verdict }: { verdict: Verdict }) {
 }
 
 export function ScoreRing({ score, size = 52 }: { score: number; size?: number }) {
-  const color = score >= 75 ? '#3f7458' : score >= 40 ? '#b47a2c' : '#b9473f';
-  return <div className="grid shrink-0 place-items-center rounded-full" role="img" aria-label={`Readiness score ${score} out of 100`} style={{ width: size, height: size, background: `conic-gradient(${color} ${score * 3.6}deg, #ebe7df 0deg)` }}><div className="grid place-items-center rounded-full bg-[#fffefa] font-bold" style={{ width: size - 9, height: size - 9, fontSize: size < 60 ? 12 : 16 }}>{score}</div></div>;
+  const color = score >= 75 ? 'var(--verdict-bid)' : score >= 40 ? 'var(--verdict-risky)' : 'var(--verdict-dont)';
+  return <div className="grid shrink-0 place-items-center rounded-full" role="img" aria-label={`Readiness score ${score} out of 100`} style={{ width: size, height: size, background: `conic-gradient(${color} ${score * 3.6}deg, var(--verdict-track) 0deg)` }}><div className="grid place-items-center rounded-full bg-[#fffefa] font-bold" style={{ width: size - 9, height: size - 9, fontSize: size < 60 ? 12 : 16 }}>{score}</div></div>;
 }

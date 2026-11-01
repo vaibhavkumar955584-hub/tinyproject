@@ -240,8 +240,8 @@ export function TenderTable({ tenders, onTenderSelect, showFilters = true }: Ten
                           <span
                             className={`rounded px-1.5 py-0.5 text-[9px] font-extrabold uppercase tracking-wider ${
                               tender.source === 'CPPP'
-                                ? 'bg-[#2B4E6B] text-white'
-                                : 'bg-[#6B4226] text-white'
+                                ? 'bg-[#2B4E6B] text-white dark:bg-[#4a7c9e]'
+                                : 'bg-[#6B4226] text-white dark:bg-[#8B5E3C]'
                             }`}
                           >
                             {tender.source}

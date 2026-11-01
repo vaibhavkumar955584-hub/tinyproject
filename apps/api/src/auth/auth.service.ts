@@ -32,7 +32,7 @@ async function verifyPassword(storedHash: string, password: string): Promise<boo
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService, private readonly config: ConfigService) {}
+  constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService, private readonly config: ConfigService) { }
 
   private cookieOptions() {
     const isProd = this.config.get<string>('NODE_ENV') === 'production';

@@ -124,7 +124,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     />
                     <span>{label}</span>
                     {href === '/monitoring' && (
-                      <span className="ml-auto flex h-2 w-2 rounded-full bg-[#2F6B4F] ring-4 ring-[#2F6B4F]/20" />
+                      <span className="ml-auto flex h-2 w-2 rounded-full bg-[#2F6B4F] ring-4 ring-[#2F6B4F]/20 dark:bg-[#7BB896] dark:ring-[#7BB896]/30" />
                     )}
                   </Link>
                 );
@@ -150,7 +150,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
             <div className="flex items-center justify-between px-1">
               <div className="flex items-center gap-2">
-                <div className="h-2 w-2 rounded-full bg-[#2F6B4F] animate-pulse" />
+                <div className="h-2 w-2 rounded-full bg-[#2F6B4F] animate-pulse dark:bg-[#7BB896]" />
                 <span className="text-[10px] font-semibold text-[#6B6259] dark:text-[#9E958A]">TinyFish Agent Ready</span>
               </div>
               <ThemeToggle className="h-8 w-8 rounded-lg border-0 bg-transparent text-[#6B4226] hover:bg-[#EFE8DD] dark:text-[#B8977E] dark:hover:bg-[#28231E]" />
@@ -186,7 +186,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 >
                   TenderGuard
                 </Link>
-                <span className="text-[#A3998C]">/</span>
+                <span className="text-[#A3998C] dark:text-[#756D63]">/</span>
                 <span className="font-semibold text-[#2E2118] dark:text-[#F2EBE1]">{currentPageTitle}</span>
               </div>
             </div>
@@ -218,7 +218,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                   aria-label="View notifications"
                 >
                   <Bell size={16} />
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#A83832] text-[9px] font-bold text-white">
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-[#A83832] text-[9px] font-bold text-white dark:bg-[#DE8F87]">
                     2
                   </span>
                 </button>
@@ -244,13 +244,13 @@ export function AppShell({ children }: { children: ReactNode }) {
                           className="block rounded-lg p-2 hover:bg-[#FAF7F2] transition dark:hover:bg-[#28231E]"
                         >
                           <div className="flex items-center gap-1.5 font-semibold text-[#6B4226] dark:text-[#B8977E]">
-                            <Radio size={12} className="text-[#2F6B4F]" />
+                            <Radio size={12} className="text-[#2F6B4F] dark:text-[#7BB896]" />
                             <span>{alert.changeType === 'DEADLINE' ? 'Deadline Extended' : 'Turnover Condition Relaxed'}</span>
                           </div>
                           <p className="mt-0.5 text-[11px] text-[#6B6259] dark:text-[#9E958A] line-clamp-1">
                             {alert.tender.title}
                           </p>
-                          <p className="mt-1 text-[10px] text-[#A3998C]">Tender Ref: {alert.tender.source}</p>
+                          <p className="mt-1 text-[10px] text-[#A3998C] dark:text-[#756D63]">Tender Ref: {alert.tender.source}</p>
                         </Link>
                       ))}
                     </div>
@@ -273,7 +273,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                       Small MSME · UP
                     </span>
                   </div>
-                  <ChevronDown size={14} className="text-[#8C8276]" />
+                  <ChevronDown size={14} className="text-[#8C8276] dark:text-[#756D63]" />
                 </button>
 
                 {profileMenuOpen && (

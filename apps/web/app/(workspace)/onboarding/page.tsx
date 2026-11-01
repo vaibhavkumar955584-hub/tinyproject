@@ -50,7 +50,17 @@ export default function OnboardingPage() {
     <div className="mx-auto grid max-w-5xl gap-5 lg:grid-cols-[minmax(0,1.35fr)_minmax(260px,.65fr)]">
       <Card className="p-5 sm:p-8">
         <div className="mb-7 flex items-center gap-3">
-          {[1, 2].map((number) => <div key={number} className="flex flex-1 items-center gap-2"><span className={`grid h-8 w-8 place-items-center rounded-full text-xs font-bold ${step >= number ? 'bg-[#694d38] text-white' : 'bg-[#eeeae2] text-[#8b8479]'}`}>{step > number ? <Check size={15} /> : number}</span><span className={`text-xs font-bold ${step === number ? 'text-[#4d382a]' : 'muted'}`}>{number === 1 ? 'Business details' : 'Readiness documents'}</span>{number === 1 && <span className="h-px flex-1 bg-[#e6e1d8]" />}</div>)}
+          {[1, 2].map((number) => (
+            <div key={number} className="flex flex-1 items-center gap-2">
+              <span className={`grid h-8 w-8 place-items-center rounded-full text-xs font-bold ${step >= number ? 'bg-[#694d38] text-white' : 'bg-[#eeeae2] text-[#8b8479] dark:text-[#756D63]'}`}>
+                {step > number ? <Check size={15} /> : number}
+              </span>
+              <span className={`text-xs font-bold ${step === number ? 'text-[#4d382a]' : 'muted'}`}>
+                {number === 1 ? 'Business details' : 'Readiness documents'}
+              </span>
+              {number === 1 && <span className="h-px flex-1 bg-[#e6e1d8] dark:bg-[#38312A]" />}
+            </div>
+          ))}
         </div>
         <form onSubmit={submit}>
           {step === 1 ? <div className="space-y-5 animate-in">
@@ -65,13 +75,13 @@ export default function OnboardingPage() {
           </div> : <div className="space-y-6 animate-in">
             <fieldset><legend className="mb-3 flex items-center gap-2 text-sm font-bold"><FileText size={17} className="text-[#355a78]" />Documents you already hold</legend><p className="muted mb-3 text-xs leading-5">We compare required documents against this list and add missing items to your checklist.</p><div className="grid gap-2 sm:grid-cols-2">{commonDocuments.map((doc) => <Choice key={doc} label={doc} checked={documentsHeld.includes(doc)} onChange={() => toggleArray('documentsHeld', doc)} />)}</div><div className="mt-3 flex gap-2"><input value={customDocument} onChange={(event) => setCustomDocument(event.target.value)} className="field py-2.5 text-sm" placeholder="Add another document" /><button type="button" className="btn-secondary shrink-0 py-2" onClick={() => { const value = customDocument.trim(); if (value) toggleArray('documentsHeld', value); setCustomDocument(''); }}>Add</button></div></fieldset>
             <fieldset><legend className="mb-3 flex items-center gap-2 text-sm font-bold"><BadgeCheck size={17} className="text-[#355a78]" />Certifications</legend><div className="grid gap-2 sm:grid-cols-2">{commonCertifications.map((cert) => <Choice key={cert} label={cert} checked={certifications.includes(cert)} onChange={() => toggleArray('certifications', cert)} />)}</div><div className="mt-3 flex gap-2"><input value={customCertification} onChange={(event) => setCustomCertification(event.target.value)} className="field py-2.5 text-sm" placeholder="Add another certification" /><button type="button" className="btn-secondary shrink-0 py-2" onClick={() => { const value = customCertification.trim(); if (value) toggleArray('certifications', value); setCustomCertification(''); }}>Add</button></div></fieldset>
-            {save.isError && <p role="alert" className="rounded-xl bg-[#f8eae7] p-3 text-sm text-[#a93b34]">{save.error.message}</p>}
+            {save.isError && <p role="alert" className="rounded-xl bg-[#f8eae7] p-3 text-sm text-[#a93b34] dark:text-[#DE8F87]">{save.error.message}</p>}
             <div className="flex flex-wrap justify-between gap-3 border-t border-[#e6e1d8] pt-5"><button type="button" onClick={() => setStep(1)} className="btn-secondary"><ArrowLeft size={15} />Back</button><button disabled={save.isPending} className="btn-primary">{save.isPending ? 'Saving…' : 'Save profile and start'} <ArrowRight size={16} /></button></div>
           </div>}
         </form>
       </Card>
       <aside className="space-y-4">
-        <Card className="bg-[#355a78] p-5 text-white"><div className="flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-[.14em] text-[#c4d4de]">Profile strength</span><Sparkles size={17} /></div><div className="mt-4 flex items-end gap-2"><span className="text-4xl font-bold">{strength}%</span><span className="mb-1 text-xs text-[#d3e0e7]">complete</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-[#b9d6c0] transition-all" style={{ width: `${strength}%` }} /></div><p className="mt-4 text-xs leading-5 text-[#e2ebef]">More detail helps TenderGuard explain which tender clauses match your evidence and what’s missing.</p></Card>
+        <Card className="bg-[#355a78] p-5 text-white dark:bg-[#242E38]"><div className="flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-[.14em] text-[#c4d4de] dark:text-[#9FC9C9]">Profile strength</span><Sparkles size={17} /></div><div className="mt-4 flex items-end gap-2"><span className="text-4xl font-bold">{strength}%</span><span className="mb-1 text-xs text-[#d3e0e7] dark:text-[#8FB3C9]">complete</span></div><div className="mt-3 h-2 overflow-hidden rounded-full bg-white/20 dark:bg-[#302A24]"><div className="h-full rounded-full bg-[#b9d6c0] transition-all" style={{ width: `${strength}%` }} /></div><p className="mt-4 text-xs leading-5 text-[#e2ebef] dark:text-[#BDD0DF]">More detail helps TenderGuard explain which tender clauses match your evidence and what’s missing.</p></Card>
         <Card className="p-5"><p className="eyebrow">How we use this</p><ul className="mt-4 space-y-3 text-xs leading-5 text-[#69645c]"><li className="flex gap-2"><Check className="mt-0.5 shrink-0 text-[#3f7458]" size={15} />Compare explicit tender thresholds against your profile.</li><li className="flex gap-2"><Check className="mt-0.5 shrink-0 text-[#3f7458]" size={15} />Highlight documents and conditions to verify.</li><li className="flex gap-2"><Check className="mt-0.5 shrink-0 text-[#3f7458]" size={15} />Never treat MSME relaxations as automatic.</li></ul></Card>
         <p className="muted px-1 text-[10px] leading-4">TenderGuard doesn’t store passwords for procurement portals and never submits a bid on your behalf.</p>
       </aside>
@@ -80,7 +90,7 @@ export default function OnboardingPage() {
 }
 
 function Choice({ label, checked, onChange }: { label: string; checked: boolean; onChange: () => void }) {
-  return <label className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-xs font-medium transition ${checked ? 'border-[#a9c5b1] bg-[#e9f2ec] text-[#3f7458]' : 'border-[#e6e1d8] bg-[#fffefa] text-[#69645c] hover:bg-[#f7f5ef]'}`}><input type="checkbox" checked={checked} onChange={onChange} className="accent-[#3f7458]" />{label}</label>;
+  return <label className={`flex cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-xs font-medium transition ${checked ? 'border-[#a9c5b1] bg-[#e9f2ec] text-[#3f7458] dark:border-[#2D543D]' : 'border-[#e6e1d8] bg-[#fffefa] text-[#69645c] hover:bg-[#f7f5ef]'}`}><input type="checkbox" checked={checked} onChange={onChange} className="accent-[#3f7458]" />{label}</label>;
 }
 
 function FieldError({ message }: { message?: string | undefined }) { return message ? <p className="mt-1 text-xs text-[#b9473f]">{message}</p> : null; }

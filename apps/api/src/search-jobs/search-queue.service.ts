@@ -15,7 +15,7 @@ export class SearchQueueService implements OnModuleInit, OnModuleDestroy {
   private boss?: any;
   private inMemoryHandler?: (jobId: string) => Promise<void>;
 
-  constructor(private readonly config: ConfigService) {}
+  constructor(private readonly config: ConfigService) { }
 
   async onModuleInit(): Promise<void> {
     const PgBossClass = getPgBoss();

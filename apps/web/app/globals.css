@@ -28,6 +28,10 @@
   --red-border: #ECC2BD;
   --blue-border: #BDD0DF;
   --muted-subtle: #A3998C;
+  --verdict-bid: #3f7458;
+  --verdict-risky: #b47a2c;
+  --verdict-dont: #b9473f;
+  --verdict-track: #ebe7df;
   color-scheme: light;
 }
 
@@ -55,6 +59,10 @@
   --red-border: #5C322D;
   --blue-border: #334B5C;
   --muted-subtle: #756D63;
+  --verdict-bid: #7BB896;
+  --verdict-risky: #DEBA70;
+  --verdict-dont: #DE8F87;
+  --verdict-track: #38312A;
   color-scheme: dark;
 }
 
@@ -120,6 +128,33 @@ a { color: inherit; text-decoration: none; }
 .dark [class~="text-[#777168]"], .dark [class~="text-[#817b72]"], .dark [class~="text-[#69645c]"], .dark [class~="text-[#6f6a62]"], .dark [class~="text-[#625d55]"], .dark [class~="text-[#746f67]"], .dark [class~="text-[#888176]"] { color: var(--muted) !important; }
 .dark [class~="text-[#bcb3a6]"] { color: var(--muted-subtle) !important; }
 .dark [class~="hover:bg-[#f3f0e9]"]:hover { background-color: var(--surface-hover) !important; }
+
+/* Landing page + shared hardcoded hex colors — dark mode overrides */
+.dark [class~="bg-[#FAF7F2]"] { background-color: var(--canvas) !important; }
+.dark [class~="bg-[#FFFFFF]"] { background-color: var(--paper) !important; }
+.dark [class~="text-[#2E2118]"] { color: var(--ink) !important; }
+.dark [class~="text-[#7A6A5A]"] { color: var(--muted) !important; }
+.dark [class~="border-[#E4DAC9]"] { border-color: var(--line) !important; }
+.dark [class~="bg-[#6B4226]"] { background-color: var(--brown) !important; }
+.dark [class~="text-[#6B4226]"] { color: var(--brown-dark) !important; }
+.dark [class~="bg-[#F3EDE3]"] { background-color: var(--blue-soft) !important; }
+.dark [class~="bg-[#DDE9DF]"] { background-color: var(--green-soft) !important; }
+.dark [class~="bg-[#2E7D4F]"], .dark [class~="bg-[#2F6B4F]"] { background-color: var(--green) !important; }
+.dark [class~="text-[#2E7D4F]"], .dark [class~="text-[#2F6B4F]"] { color: var(--green) !important; }
+.dark [class~="bg-[#B7791F]"] { background-color: var(--amber) !important; }
+.dark [class~="bg-[#B23A2E]"] { background-color: var(--red) !important; }
+.dark [class~="text-[#B23A2E]"] { color: var(--red) !important; }
+.dark [class~="bg-[#553320]"] { background-color: var(--brown-dark) !important; }
+
+/* Opacity variants for landing page */
+.dark [class~="bg-[#FAF7F2]/95"] { background-color: color-mix(in srgb, var(--canvas) 95%, transparent) !important; }
+.dark [class~="bg-[#FAF7F2]/50"] { background-color: color-mix(in srgb, var(--canvas) 50%, transparent) !important; }
+.dark [class~="bg-[#E4DAC9]/40"] { background-color: color-mix(in srgb, var(--line) 40%, transparent) !important; }
+.dark [class~="border-[#E4DAC9]/40"] { border-color: color-mix(in srgb, var(--line) 40%, transparent) !important; }
+
+/* Component-level dark fixes */
+.dark .btn-ghost-hover:hover { background-color: var(--surface-hover) !important; }
+.dark [class~="hover:bg-white/60"]:hover { background-color: color-mix(in srgb, #000 20%, transparent) !important; }
 
 .animate-in { animation: fade-up .35s ease both; }
 @keyframes fade-up { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: translateY(0); } }

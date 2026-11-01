@@ -18,7 +18,7 @@ import { PrismaService } from './prisma/prisma.service';
 
 @Controller('health')
 class HealthController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   @Get()
   async getHealth(): Promise<{ status: string; database: string; queue: string; latencyMs: number; version: string }> {
@@ -56,4 +56,4 @@ class HealthController {
   controllers: [HealthController],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
-export class AppModule {}
+export class AppModule { }

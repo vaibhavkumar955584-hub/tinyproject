@@ -106,10 +106,10 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       {/* Left Brand Panel */}
       <section className="flex min-h-screen flex-col justify-between bg-[#6B4226] px-6 py-8 text-[#FFFFFF] sm:px-12 lg:px-16 dark:bg-[#28231E]">
         <div className="flex items-center justify-between gap-4">
-          <Link href="/" aria-label="TenderGuard home" className="inline-flex w-fit items-center rounded-2xl bg-white p-2.5 shadow-sm">
+          <Link href="/" aria-label="TenderGuard home" className="inline-flex w-fit items-center rounded-2xl bg-white p-2.5 shadow-sm dark:bg-[#221D19]">
             <BrandLogo className="h-auto w-[200px]" priority />
           </Link>
-          <ThemeToggle className="border-white/20 bg-white/10 text-white hover:bg-white/20" />
+          <ThemeToggle className="border-white/20 bg-white/10 text-white hover:bg-white/20 dark:border-[#51483e] dark:bg-[#2d2924]/50 dark:text-[#f5efe4] dark:hover:bg-[#2d2924]" />
         </div>
 
         <div className="my-10 max-w-lg">
