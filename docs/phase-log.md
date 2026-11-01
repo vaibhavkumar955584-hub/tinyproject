@@ -59,3 +59,5 @@ The user explicitly asked to complete every phase without the original phase-by-
 - Installed and authenticated the 21st.dev Codex skills/CLI; reviewed its `SeaGreen Minimal` theme and adapted its calm surfaces and restrained green accent to TenderGuard's existing warm paper, brown, steel-blue, red, and green palette.
 - Added the supplied transparent TenderGuard wordmark and shield mark to the landing, login/register, workspace navigation, and app icon. Added the shared `BrandLogo` component.
 - Added a project-aware 21st design context under `.21st/` and recorded the shared theme/logo rules in `docs/ui-design.md`.
+- Extended the shared light/dark system across route-level surfaces, added accessible theme controls across public/auth/workspace screens, and completed shared loading skeleton and toast feedback patterns for search and watchlist flows.
+- `npm run build`: passed after the UI update. 21st UI review reported mostly palette-literal and capped-width heuristics; the only animation warning on the search progress meter was changed to a width-only transition.

@@ -7,6 +7,7 @@ import { Card, EmptyState, PageTitle } from '../../../components/ui';
 import { VerdictBadge } from '../../../components/verdict';
 import { api } from '../../../lib/api';
 import { useState } from 'react';
+import { SkeletonList } from '../../../components/skeleton';
 
 interface AlertItem { id: string; changeType: 'DEADLINE' | 'EMD' | 'CONDITION' | 'OTHER'; beforeJson: Record<string, unknown>; afterJson: Record<string, unknown>; verdictBefore: string | null; verdictAfter: string | null; sentAt: string | null; createdAt: string; tender: { id: string; title: string; source: string; url: string } }
 
@@ -25,7 +26,7 @@ export default function AlertsPage() {
   return <>
     <PageTitle eyebrow="Tender changes" title="Alerts & corrigenda" description="A change feed for deadlines, EMD values, eligibility clauses, and verdict changes on tenders you watch." action={<span className="badge badge-blue"><BellRing size={13} />Meaningful changes only</span>} />
     <Card className="mb-5 flex flex-wrap items-end gap-3 p-4 sm:p-5"><div className="min-w-[220px] flex-1"><p className="text-sm font-bold">Connect Telegram alerts</p><p className="muted mt-1 text-xs">Start your configured TenderGuard bot, then enter your numeric chat ID. Email alerts use your account address when SMTP is configured.</p><label htmlFor="telegram-chat-id" className="sr-only">Telegram chat ID</label><input id="telegram-chat-id" value={chatId} onChange={(event) => setChatId(event.target.value)} inputMode="numeric" className="field mt-3 max-w-sm" placeholder="Telegram chat ID" /></div><button type="button" disabled={linkTelegram.isPending || !chatId.trim()} onClick={() => linkTelegram.mutate()} className="btn-secondary">{linkTelegram.isPending ? 'Connecting…' : 'Connect Telegram'}</button>{telegramNotice && <p aria-live="polite" className="w-full text-xs text-[#355a78]">{telegramNotice}</p>}</Card>
-    {query.isPending ? <Card className="p-10 text-center text-sm text-[#777168]">Loading alerts…</Card> : null}
+    {query.isPending ? <SkeletonList items={3} /> : null}
     {query.isError && <Card className="p-5 text-sm text-[#b9473f]">{query.error.message}</Card>}
     {query.data?.length === 0 && <EmptyState icon={<BellRing size={21} />} title="No changes yet" body="When a watched tender changes, TenderGuard will show the old and new values here and explain what to recheck." action={<Link href="/search" className="btn-primary">Browse tenders</Link>} />}
     <div className="space-y-4">{query.data?.map((alert) => {

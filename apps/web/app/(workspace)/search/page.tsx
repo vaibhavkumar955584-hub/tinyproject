@@ -7,7 +7,8 @@ import { useEffect, useMemo, useState } from 'react';
 import type { Verdict } from '@tenderguard/shared';
 import { api, apiBaseUrl } from '../../../lib/api';
 import { Card, EmptyState, PageTitle } from '../../../components/ui';
-import { TenderCard, type TenderCardData } from '../../../components/tender-card';
+import { TenderCard, TenderCardSkeleton, type TenderCardData } from '../../../components/tender-card';
+import { useToast } from '../../../components/toast';
 
 interface SearchJob {
   id: string;
@@ -23,6 +24,7 @@ const statusOrder: Record<Verdict, number> = { BID: 0, RISKY: 1, DONT_BID: 2 };
 
 export default function SearchPage() {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [query, setQuery] = useState('IT helpdesk support');
   const [sources, setSources] = useState(['CPPP', 'GEM']);
   const [jobId, setJobId] = useState<string | null>(null);
@@ -32,7 +34,8 @@ export default function SearchPage() {
 
   const startSearch = useMutation({
     mutationFn: () => api<{ jobId: string }>('/search-jobs', { method: 'POST', body: JSON.stringify({ query, sources }) }),
-    onSuccess: ({ jobId: createdId }) => { setJobId(createdId); setActivities([]); queryClient.setQueryData(['search-job', createdId], undefined); },
+    onSuccess: ({ jobId: createdId }) => { setJobId(createdId); setActivities([]); queryClient.setQueryData(['search-job', createdId], undefined); toast({ type: 'info', title: 'Search started', message: 'TenderGuard is checking the selected public portals.' }); },
+    onError: (error) => toast({ type: 'error', title: 'Search could not start', message: error.message }),
   });
   const jobQuery = useQuery({
     queryKey: ['search-job', jobId],
@@ -48,10 +51,17 @@ export default function SearchPage() {
       const item = JSON.parse((event as MessageEvent<string>).data) as ActivityItem;
       setActivities((previous) => previous.some((entry) => entry.id === item.id) ? previous : [...previous, item].slice(-30));
     });
-    stream.addEventListener('complete', () => { stream.close(); void jobQuery.refetch(); });
+    stream.addEventListener('complete', (event) => {
+      stream.close();
+      void jobQuery.refetch();
+      const completion = JSON.parse((event as MessageEvent<string>).data) as { status: 'DONE' | 'FAILED' };
+      toast(completion.status === 'FAILED'
+        ? { type: 'error', title: 'Search could not finish', message: 'You can check the activity panel and try again.' }
+        : { type: 'success', title: 'Search complete', message: 'Your results are ready to review.' });
+    });
     stream.onerror = () => stream.close();
     return () => stream.close();
-  }, [jobId]);
+  }, [jobId, toast]);
 
   const results = useMemo(() => {
     return [...(jobQuery.data?.results ?? [])]
@@ -80,7 +90,7 @@ export default function SearchPage() {
 
           {jobId && jobQuery.data && <Card className="p-4 sm:p-5">
             <div className="flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-2 text-sm font-bold"><Activity size={17} className="text-[#355a78]" />{running ? 'Agent is reviewing public notices' : jobQuery.data.status === 'FAILED' ? 'Search needs attention' : 'Search complete'}</div><span className="text-xs font-bold text-[#355a78]">{jobQuery.data.progress}%</span></div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#e9e5dd]"><div className="h-full rounded-full bg-[#355a78] transition-all duration-500" style={{ width: `${jobQuery.data.progress}%` }} /></div>
+            <div className="mt-3 h-2 overflow-hidden rounded-full bg-[#e9e5dd]"><div className="h-full rounded-full bg-[#355a78] transition-[width] duration-500" style={{ width: `${jobQuery.data.progress}%` }} /></div>
             <div className="mt-3 flex justify-between text-[10px] font-semibold text-[#817b72]"><span>Discover</span><span>Read clauses</span><span>Check eligibility</span><span>Rank</span></div>
           </Card>}
 
@@ -89,7 +99,7 @@ export default function SearchPage() {
             {jobQuery.data?.results?.length ? <div className="flex flex-wrap items-center gap-2"><label className="sr-only" htmlFor="verdict-filter">Filter by verdict</label><select id="verdict-filter" className="field w-auto py-2 text-xs" value={filter} onChange={(event) => setFilter(event.target.value as 'ALL' | Verdict)}><option value="ALL">All verdicts</option><option value="BID">Bid</option><option value="RISKY">Risky</option><option value="DONT_BID">Don’t bid</option></select><button onClick={() => setClosingSoon((value) => !value)} aria-pressed={closingSoon} className={`btn-secondary py-2 text-xs ${closingSoon ? 'border-[#355a78] bg-[#e9f0f5] text-[#355a78]' : ''}`}><Filter size={14} />Closing soon</button></div> : null}
           </div>
 
-          {jobQuery.isPending && jobId ? <Card className="p-10 text-center"><LoaderCircle className="mx-auto animate-spin text-[#355a78]" size={24} /><p className="muted mt-3 text-sm">Loading live search results…</p></Card> : null}
+          {jobQuery.isPending && jobId ? <div className="space-y-4" aria-label="Loading search results"><TenderCardSkeleton /><TenderCardSkeleton /></div> : null}
           {jobQuery.data?.status === 'FAILED' && <EmptyState icon={<Activity size={21} />} title="This search did not finish" body="Your profile is still safe. Check the API and database connection, then run the search again." action={<button className="btn-secondary" onClick={() => startSearch.mutate()}>Try again</button>} />}
           {jobQuery.data?.status === 'DONE' && results.length === 0 && <EmptyState icon={<Search size={22} />} title="No tenders match these filters" body="Try a broader query or turn off the closing-soon filter. TenderGuard only shows pages it can read from the selected public portals." />}
           {results.map((tender) => <TenderCard key={tender.id} tender={tender} onWatch={() => void queryClient.invalidateQueries({ queryKey: ['watches'] })} />)}
