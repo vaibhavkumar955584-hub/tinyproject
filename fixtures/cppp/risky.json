@@ -1,0 +1,21 @@
+{
+  "source": "CPPP",
+  "sourceTenderId": "DEMO-CPPP-002",
+  "url": "https://example.com/tenders/demo-cppp-002",
+  "title": "Demo: Annual network maintenance and support",
+  "department": "Demo State Infrastructure Unit",
+  "location": "Uttar Pradesh",
+  "estimatedValueInr": 18000000,
+  "emdInr": 180000,
+  "publishedAt": "2026-10-25T09:00:00.000Z",
+  "closingAt": "2026-11-03T10:00:00.000Z",
+  "requirements": [
+    { "type": "TURNOVER", "valueJson": { "minimumInr": 2800000 }, "sourceQuote": "The bidder shall have average annual turnover of at least Rs. 28 lakh during the last three financial years." },
+    { "type": "EXPERIENCE", "valueJson": { "minimumYears": 2 }, "sourceQuote": "The bidder shall have at least 2 years of relevant experience." },
+    { "type": "DOCUMENT", "valueJson": { "name": "PAN" }, "sourceQuote": "The bidder shall submit PAN, GST Registration and a valid ISO 9001 certificate." },
+    { "type": "DOCUMENT", "valueJson": { "name": "GST Registration" }, "sourceQuote": "The bidder shall submit PAN, GST Registration and a valid ISO 9001 certificate." },
+    { "type": "CERTIFICATION", "valueJson": { "name": "ISO 9001" }, "sourceQuote": "The bidder shall submit PAN, GST Registration and a valid ISO 9001 certificate." },
+    { "type": "EMD", "valueJson": { "amountInr": 180000 }, "sourceQuote": "EMD is Rs. 1,80,000." }
+  ],
+  "rawText": "DEMO FIXTURE — not a live tender. Annual network maintenance and support in Uttar Pradesh. The bidder shall have average annual turnover of at least Rs. 28 lakh during the last three financial years. The bidder shall have at least 2 years of relevant experience. The bidder shall submit PAN, GST Registration and a valid ISO 9001 certificate. EMD is Rs. 1,80,000. Bids close on 3 November 2026 at 15:30 IST."
+}

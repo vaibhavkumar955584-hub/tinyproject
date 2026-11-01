@@ -3,15 +3,20 @@
   "private": true,
   "packageManager": "pnpm@10.12.1",
   "engines": { "node": ">=20" },
+  "pnpm": {
+    "onlyBuiltDependencies": ["@prisma/client", "@prisma/engines", "argon2", "prisma"]
+  },
   "scripts": {
-    "dev": "concurrently -k -n web,api -c blue,green \"pnpm --filter @tenderguard/web dev\" \"pnpm --filter @tenderguard/api start:dev\"",
+    "dev": "pnpm --filter @tenderguard/shared build && concurrently -k -n web,api -c blue,green \"pnpm --filter @tenderguard/web dev\" \"pnpm --filter @tenderguard/api start:dev\"",
     "build": "pnpm -r build",
     "lint": "pnpm -r lint",
-    "typecheck": "pnpm -r typecheck",
+    "typecheck": "pnpm --filter @tenderguard/shared build && pnpm -r typecheck",
     "test": "pnpm -r test",
+    "test:coverage": "pnpm --filter @tenderguard/shared test:coverage",
     "db:up": "docker compose up -d postgres",
     "db:down": "docker compose down",
     "db:migrate": "pnpm --filter @tenderguard/api prisma:migrate",
+    "db:deploy": "pnpm --filter @tenderguard/api exec prisma migrate deploy",
     "db:seed": "pnpm --filter @tenderguard/api prisma:seed",
     "db:studio": "pnpm --filter @tenderguard/api prisma:studio",
     "format": "prettier --write ."

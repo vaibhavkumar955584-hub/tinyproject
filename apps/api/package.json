@@ -13,10 +13,23 @@
     "prisma:studio": "prisma studio"
   },
   "dependencies": {
+    "@nestjs/config": "^4.0.2",
+    "@nestjs/jwt": "^11.0.0",
+    "@nestjs/schedule": "^6.0.0",
+    "@nestjs/throttler": "^6.4.0",
+    "@prisma/client": "^6.16.2",
     "@nestjs/common": "^11.1.3",
     "@nestjs/core": "^11.1.3",
     "@nestjs/platform-express": "^11.1.3",
     "@tenderguard/shared": "workspace:*",
+    "argon2": "^0.44.0",
+    "cookie-parser": "^1.4.7",
+    "dotenv": "^16.6.1",
+    "helmet": "^8.1.0",
+    "nodemailer": "^7.0.5",
+    "pg-boss": "^10.3.2",
+    "pdf-parse": "^1.1.1",
+    "prisma": "^6.16.2",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2"
   },
@@ -25,10 +38,13 @@
     "@nestjs/schematics": "^11.0.5",
     "@nestjs/testing": "^11.1.3",
     "@types/express": "^5.0.3",
+    "@types/cookie-parser": "^1.4.9",
     "@types/jest": "^30.0.0",
     "@types/node": "^22.16.5",
+    "@types/nodemailer": "^6.4.17",
     "jest": "^30.0.4",
     "ts-jest": "^29.4.0",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
 }

@@ -1,0 +1,20 @@
+{
+  "source": "GEM",
+  "sourceTenderId": "DEMO-GEM-001",
+  "url": "https://example.com/tenders/demo-gem-001",
+  "title": "Demo: Statewide enterprise network operations contract",
+  "department": "Demo National Digital Services Agency",
+  "location": "Gujarat",
+  "estimatedValueInr": 125000000,
+  "emdInr": 2500000,
+  "publishedAt": "2026-10-22T09:00:00.000Z",
+  "closingAt": "2026-11-30T10:00:00.000Z",
+  "requirements": [
+    { "type": "TURNOVER", "valueJson": { "minimumInr": 10000000 }, "sourceQuote": "The bidder shall have average annual turnover of at least Rs. 1 crore during the last three financial years." },
+    { "type": "EXPERIENCE", "valueJson": { "minimumYears": 5 }, "sourceQuote": "The bidder shall have at least 5 years of relevant enterprise network experience." },
+    { "type": "CERTIFICATION", "valueJson": { "name": "ISO 27001" }, "sourceQuote": "The bidder shall hold a current ISO 27001 certificate." },
+    { "type": "LOCATION", "valueJson": { "state": "Gujarat" }, "sourceQuote": "The bidder shall maintain a registered office in Gujarat." },
+    { "type": "EMD", "valueJson": { "amountInr": 2500000 }, "sourceQuote": "EMD is Rs. 25,00,000." }
+  ],
+  "rawText": "DEMO FIXTURE — not a live tender. Enterprise network operations across Gujarat. The bidder shall have average annual turnover of at least Rs. 1 crore during the last three financial years. The bidder shall have at least 5 years of relevant enterprise network experience. The bidder shall hold a current ISO 27001 certificate. The bidder shall maintain a registered office in Gujarat. EMD is Rs. 25,00,000. Bids close on 30 November 2026 at 15:30 IST."
+}

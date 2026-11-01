@@ -2,14 +2,31 @@
   "name": "@tenderguard/shared",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "exports": { ".": "./src/index.ts", "./env": "./src/env.ts" },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./env": {
+      "types": "./dist/env.d.ts",
+      "default": "./dist/env.js"
+    }
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:coverage": "vitest run --coverage.enabled --coverage.include=src/eligibility.ts --coverage.thresholds.statements=90 --coverage.thresholds.branches=90 --coverage.thresholds.functions=90 --coverage.thresholds.lines=90"
   },
-  "dependencies": { "zod": "^3.25.67" },
-  "devDependencies": { "@types/node": "^22.16.5", "vitest": "^3.2.4" }
+  "dependencies": {
+    "zod": "^3.25.67"
+  },
+  "devDependencies": {
+    "@types/node": "^22.16.5",
+    "@vitest/coverage-v8": "3.2.7",
+    "vitest": "^3.2.4"
+  }
 }

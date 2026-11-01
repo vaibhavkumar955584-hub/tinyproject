@@ -1,8 +1,8 @@
 # TenderGuard AI architecture
 
-## Current phase: 0 — scaffold
+## Current phase: 7 — product MVP and hardening
 
-This repository is being expanded from the TinyFish workshop starter into the TenderGuard AI pnpm monorepo. The original Python workshop examples are retained while the new app is scaffolded.
+This repository expands the TinyFish workshop starter into TenderGuard AI. The original Python workshop examples remain preserved.
 
 ```mermaid
 flowchart LR
@@ -12,22 +12,31 @@ flowchart LR
   API --> DB[(PostgreSQL 16)]
   API --> Queue[pg-boss jobs]
   Queue --> Agent[WebAgentPort]
-  Agent --> TinyFish[TinyFish adapter]
+  Agent --> TinyFish[TinyFish Search and Fetch]
   Agent --> Fixtures[Fixture adapter]
   API --> LLM[LlmPort]
   LLM --> Providers[Gemini / OpenAI]
 ```
 
-The diagram records the intended architecture. Only the workspace shell, shared environment validation, web shell, API health endpoint, and local PostgreSQL service exist in Phase 0. Later phases add the ports, adapters, database model, and product flows.
+PostgreSQL stores profiles, jobs, public tender text, evidence, verdicts, watches, snapshots, alerts, and audit logs. pg-boss queues searches; the API streams logs over SSE. Fixture and TinyFish adapters implement the same port. Gemini and OpenAI adapters implement the extraction port. Fixture mode is intended for demos; live mode is restricted to public portal URLs and stops on CAPTCHA or login walls.
 
 ## Local services
 
 - Web: `http://localhost:3000`
 - API health: `http://localhost:4000/api/health`
 - PostgreSQL: `localhost:5432` (database/user `tenderguard`, development-only password `tenderguard_dev`)
+- Mailpit: `http://localhost:8025` (local email preview)
 
 Use `.env.example` as the safe template. Do not put provider credentials in committed files.
 
 ## UI design integration
 
-The requested Stitch MCP endpoint is `https://stitch.googleapis.com/mcp`. No Stitch connector/tool is currently exposed to this session, so no Stitch-generated screen has been produced yet. The product UI should follow the brief's indigo/teal palette, evidence-first hierarchy, responsive layout, and explicit responsible-AI notice. Connect Stitch before Phase 4 to generate and refine the screens.
+Stitch MCP generated dashboard and evidence-detail reference screens. The detail screenshot is in [design-reference/tender-detail.png](design-reference/tender-detail.png); palette and screen references are documented in [ui-design.md](ui-design.md). The generated reference included invented tender facts, so it is used only for visual hierarchy and spacing. Product evidence must come from verified source text or be labeled unknown.
+
+## Operational boundaries
+
+- Searches are capped at ten tenders and process at most five concurrently.
+- TinyFish access is isolated behind `WebAgentPort`; outbound tender URLs are restricted to HTTPS on CPPP/GeM hosts.
+- Public page fetches never solve CAPTCHAs, authenticate, or submit bids.
+- Verdicts use deterministic templates and verified clause quotes. Provider output never sets a verdict directly.
+- Docker/Postgres is required for the API, queue, migration, and seed. Without Docker, the web production build and shared logic tests still run, but API end-to-end behavior cannot be verified locally.

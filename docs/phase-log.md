@@ -1,16 +1,43 @@
 # Phase log
 
+The user explicitly asked to complete every phase without the original phase-by-phase pause. Individual phases are recorded below; commit history records implementation milestones.
+
 ## Phase 0 — Scaffold
 
-**Status:** Implemented; typecheck, lint, tests, and build pass. PostgreSQL startup is blocked because the Docker Desktop service is stopped and cannot be started from this session.
+**Status:** Implemented and committed (`6485f06`). Created the pnpm workspace, strict TypeScript config, lint/format setup, Zod environment validation, web/API shells, PostgreSQL Compose service, and quickstart. The original Python workshop files and existing `config.py` changes were preserved.
 
-- Added pnpm workspaces for `apps/web`, `apps/api`, and `packages/shared`.
-- Added strict shared TypeScript configuration, ESLint, Prettier, and Zod environment parsing.
-- Added a Next.js app shell and a NestJS API health endpoint.
-- Added PostgreSQL 16 compose service and safe `.env.example`.
-- Preserved the original TinyFish Python workshop files and existing `config.py` edits.
-- Added architecture and UI integration notes in this `docs/` directory.
+## Phase 1 — Database, auth, and profile
 
-**Verification:** `pnpm install`, `pnpm typecheck`, `pnpm lint`, `pnpm test`, and `pnpm build` pass. The shared package has two environment-schema tests; the not-yet-implemented API and web packages report no tests. `pnpm db:up` could not connect because Docker Desktop's Linux engine is unavailable; starting its service was denied by the host. Next.js reported the parent starter's separate `package-lock.json`; the web config now pins tracing to this workspace root.
+**Status:** Implemented. Includes Prisma schema, initial migration and demo seed; Argon2 password hashing, JWT httpOnly cookie auth, profile endpoints, login/register screens, and two-step business onboarding.
 
-**Known limitation:** Stitch is not connected as a tool in the current session. The endpoint and UI direction are documented; live Stitch screen generation remains for the UI phase after the connector is available.
+## Phase 2 — Evidence and eligibility brain
+
+**Status:** Implemented. Includes shared deterministic eligibility logic, quote normalization/verification, Gemini/OpenAI JSON extraction adapters with one repair attempt, and fixtures targeting BID/RISKY/DONT_BID. Automated unit coverage currently has seven shared tests; deeper coverage remains a hardening item.
+
+## Phase 3 — Search agent
+
+**Status:** Implemented. Includes fixture/TinyFish adapters, pg-boss search queue, per-tender failure isolation, ten-result cap, concurrency of five, activity logs, SSE, and ranked search results.
+
+## Phase 4 — Product UI
+
+**Status:** Implemented. Landing page, onboarding, streaming search/activity feed, tender evidence inspector, checklist, watch controls, and browser print-to-PDF export. The Stitch visual reference and screenshot are in `docs/design-reference/` and `docs/ui-design.md`.
+
+## Phase 5 — Monitoring and alerts
+
+**Status:** Implemented watch pause/resume/remove, a 15-minute due-watch poll, structured snapshot comparison, deadline/EMD/condition alerts, optional Telegram and SMTP delivery, and a fixture-mode corrigendum simulator exposed from the watchlist. Requires a running database and configured credentials to verify delivery end-to-end.
+
+## Phase 6 — Live mode
+
+**Status:** TinyFish Search/Fetch adapter is implemented with public-host restrictions, retries, and manual-step detection. A live search has not been verified because the local database runtime was unavailable.
+
+## Phase 7 — Hardening
+
+**Status:** Strict typecheck, lint, shared tests (including >90% eligibility coverage), and web/API production builds pass. GitHub Actions CI is included. Full API/browser smoke and database checks require Docker/Postgres.
+
+## Current verification
+
+- `pnpm typecheck`: passed.
+- `pnpm lint`: passed.
+- `pnpm test`: passed (7 shared tests; API/web suites have no tests yet).
+- `pnpm build`: passed (Next.js and NestJS production builds).
+- `pnpm db:up`: blocked because the Docker Desktop Linux engine was unavailable; migration, seed, and end-to-end flows could not be exercised in this environment.

@@ -1,0 +1,45 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: tenderguard
+          POSTGRES_USER: tenderguard
+          POSTGRES_PASSWORD: tenderguard_dev
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U tenderguard -d tenderguard"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql://tenderguard:tenderguard_dev@localhost:5432/tenderguard?schema=public
+      JWT_SECRET: ci-only-test-secret-not-for-deployment-123
+      AGENT_MODE: fixture
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.12.1
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @tenderguard/api exec prisma generate
+      - run: pnpm --filter @tenderguard/api exec prisma migrate deploy
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm test:coverage
+      - run: pnpm build

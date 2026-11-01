@@ -1,0 +1,211 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MsmeStatus {
+  NONE
+  MICRO
+  SMALL
+  MEDIUM
+}
+enum SearchStatus {
+  QUEUED
+  RUNNING
+  DONE
+  FAILED
+}
+enum TenderSource {
+  CPPP
+  GEM
+}
+enum FetchStatus {
+  OK
+  FETCH_FAILED
+  NEEDS_MANUAL_STEP
+}
+enum RequirementType {
+  TURNOVER
+  EXPERIENCE
+  EMD
+  DOCUMENT
+  LOCATION
+  CERTIFICATION
+  OTHER
+}
+enum VerdictType {
+  BID
+  RISKY
+  DONT_BID
+}
+enum AlertChangeType {
+  DEADLINE
+  EMD
+  CONDITION
+  OTHER
+}
+
+model User {
+  id             String            @id @default(cuid())
+  email          String            @unique
+  passwordHash   String
+  telegramChatId String?
+  createdAt      DateTime          @default(now())
+  profile        BusinessProfile?
+  watches        Watch[]
+  alerts         Alert[]
+  @@map("users")
+}
+
+model BusinessProfile {
+  id                  String       @id @default(cuid())
+  userId              String       @unique
+  category            String
+  state               String
+  annualTurnoverInr   BigInt
+  experienceYears     Int
+  msmeStatus          MsmeStatus   @default(NONE)
+  certifications      String[]
+  documentsHeld       String[]
+  updatedAt           DateTime     @updatedAt
+  user                User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  searchJobs          SearchJob[]
+  verdicts            Verdict[]
+  @@map("business_profiles")
+}
+
+model SearchJob {
+  id         String        @id @default(cuid())
+  profileId  String
+  query      String
+  status     SearchStatus  @default(QUEUED)
+  progress   Int           @default(0)
+  createdAt  DateTime      @default(now())
+  finishedAt DateTime?
+  profile    BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  tenders    SearchJobTender[]
+  logs       AgentLog[]
+  @@index([profileId, createdAt])
+  @@map("search_jobs")
+}
+
+model Tender {
+  id                String          @id @default(cuid())
+  source            TenderSource
+  sourceTenderId    String
+  url               String          @unique
+  title             String
+  department        String?
+  location          String?
+  estimatedValueInr BigInt?
+  emdInr            BigInt?
+  publishedAt       DateTime?
+  closingAt         DateTime?
+  rawText           String          @db.Text
+  contentHash       String
+  lastFetchedAt     DateTime        @default(now())
+  fetchStatus       FetchStatus     @default(OK)
+  requirements      Requirement[]
+  verdicts          Verdict[]
+  jobs              SearchJobTender[]
+  watches           Watch[]
+  snapshots         Snapshot[]
+  alerts            Alert[]
+  @@unique([source, sourceTenderId])
+  @@index([closingAt])
+  @@map("tenders")
+}
+
+model Requirement {
+  id          String           @id @default(cuid())
+  tenderId    String
+  type        RequirementType
+  valueJson   Json
+  sourceUrl   String
+  sourceQuote String           @db.Text
+  confidence  Float
+  tender      Tender           @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  @@index([tenderId, type])
+  @@map("requirements")
+}
+
+model Verdict {
+  id         String       @id @default(cuid())
+  tenderId   String
+  profileId  String
+  verdict    VerdictType
+  score      Int
+  reasons    Json
+  checklist  Json
+  createdAt  DateTime     @default(now())
+  tender     Tender       @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  profile    BusinessProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  @@unique([tenderId, profileId])
+  @@map("verdicts")
+}
+
+model SearchJobTender {
+  jobId    String
+  tenderId String
+  job      SearchJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  tender   Tender    @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  @@id([jobId, tenderId])
+  @@map("search_job_tenders")
+}
+
+model Watch {
+  id            String   @id @default(cuid())
+  userId        String
+  tenderId      String
+  intervalHours Int      @default(6)
+  active        Boolean  @default(true)
+  lastCheckedAt DateTime?
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tender        Tender   @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  @@unique([userId, tenderId])
+  @@index([active, lastCheckedAt])
+  @@map("watches")
+}
+
+model Snapshot {
+  id          String   @id @default(cuid())
+  tenderId    String
+  contentHash String
+  fieldsJson  Json
+  takenAt     DateTime @default(now())
+  tender      Tender   @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  @@index([tenderId, takenAt])
+  @@map("snapshots")
+}
+
+model Alert {
+  id            String          @id @default(cuid())
+  userId        String
+  tenderId      String
+  changeType    AlertChangeType
+  beforeJson    Json
+  afterJson     Json
+  verdictBefore String?
+  verdictAfter  String?
+  sentAt        DateTime?
+  createdAt     DateTime        @default(now())
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tender        Tender          @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  @@index([userId, createdAt])
+  @@map("alerts")
+}
+
+model AgentLog {
+  id        String   @id @default(cuid())
+  jobId     String
+  step      String
+  detail    String
+  ts        DateTime @default(now())
+  job       SearchJob @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  @@index([jobId, ts])
+  @@map("agent_logs")
+}
