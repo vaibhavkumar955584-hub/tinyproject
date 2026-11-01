@@ -1,26 +1,43 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, ServiceUnavailableException, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import * as argon2 from 'argon2';
+import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService) {}
+  private readonly googleClient = new OAuth2Client();
 
-  async register(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
-    const normalizedEmail = email.toLowerCase();
-    const exists = await this.prisma.user.findUnique({ where: { email: normalizedEmail } });
-    if (exists) throw new ConflictException({ code: 'EMAIL_IN_USE', message: 'An account with this email already exists.' });
-    const passwordHash = await argon2.hash(password, { type: argon2.argon2id });
-    const user = await this.prisma.user.create({ data: { email: normalizedEmail, passwordHash } });
-    const token = await this.jwt.signAsync({ sub: user.id, email: user.email }, { expiresIn: '7d' });
-    return { token, user: { id: user.id, email: user.email } };
-  }
+  constructor(private readonly prisma: PrismaService, private readonly jwt: JwtService, private readonly config: ConfigService) {}
 
-  async login(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
-    const user = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
-    const valid = user ? await argon2.verify(user.passwordHash, password) : false;
-    if (!user || !valid) throw new UnauthorizedException({ code: 'INVALID_CREDENTIALS', message: 'Email or password is incorrect.' });
+  async signInWithGoogle(credential: string): Promise<{ token: string; user: { id: string; email: string } }> {
+    const clientId = this.config.get<string>('GOOGLE_CLIENT_ID');
+    if (!clientId) throw new ServiceUnavailableException({ code: 'GOOGLE_AUTH_NOT_CONFIGURED', message: 'Google sign-in is not configured yet.' });
+    let payload;
+    try {
+      const ticket = await this.googleClient.verifyIdToken({ idToken: credential, audience: clientId });
+      payload = ticket.getPayload();
+    } catch {
+      throw new UnauthorizedException({ code: 'INVALID_GOOGLE_CREDENTIAL', message: 'Google could not verify this sign-in. Please try again.' });
+    }
+    if (!payload?.sub || !payload.email || payload.email_verified !== true) {
+      throw new UnauthorizedException({ code: 'UNVERIFIED_GOOGLE_ACCOUNT', message: 'Use a Google account with a verified email address.' });
+    }
+
+    const email = payload.email.toLowerCase();
+    const existingGoogleUser = await this.prisma.user.findUnique({ where: { googleSubject: payload.sub } });
+    const existingEmailUser = await this.prisma.user.findUnique({ where: { email } });
+    if (existingGoogleUser && existingEmailUser && existingGoogleUser.id !== existingEmailUser.id) {
+      throw new UnauthorizedException({ code: 'GOOGLE_ACCOUNT_CONFLICT', message: 'This Google account email is already linked to another workspace.' });
+    }
+    if (!existingGoogleUser && existingEmailUser?.googleSubject && existingEmailUser.googleSubject !== payload.sub) {
+      throw new UnauthorizedException({ code: 'GOOGLE_ACCOUNT_CONFLICT', message: 'This workspace is linked to a different Google account.' });
+    }
+    const user = existingGoogleUser
+      ? await this.prisma.user.update({ where: { id: existingGoogleUser.id }, data: { email } })
+      : existingEmailUser
+        ? await this.prisma.user.update({ where: { id: existingEmailUser.id }, data: { googleSubject: payload.sub } })
+        : await this.prisma.user.create({ data: { email, googleSubject: payload.sub } });
     const token = await this.jwt.signAsync({ sub: user.id, email: user.email }, { expiresIn: '7d' });
     return { token, user: { id: user.id, email: user.email } };
   }

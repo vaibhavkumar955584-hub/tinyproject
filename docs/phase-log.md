@@ -8,7 +8,7 @@ The user explicitly asked to complete every phase without the original phase-by-
 
 ## Phase 1 — Database, auth, and profile
 
-**Status:** Implemented. Includes Prisma schema, initial migration and demo seed; Argon2 password hashing, JWT httpOnly cookie auth, profile endpoints, login/register screens, and two-step business onboarding.
+**Status:** Implemented. Includes Prisma schema, initial migration and demo seed; Google ID-token verification, Google-subject account linking, JWT httpOnly cookie sessions, profile endpoints, Google-only sign-in/sign-up screens, and two-step business onboarding.
 
 ## Phase 2 — Evidence and eligibility brain
 

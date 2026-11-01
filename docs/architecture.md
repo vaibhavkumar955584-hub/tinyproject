@@ -20,6 +20,10 @@ flowchart LR
 
 Neon PostgreSQL stores profiles, jobs, public tender text, evidence, verdicts, watches, snapshots, alerts, and audit logs. Prisma uses the pooled `DATABASE_URL` for application queries and `DATABASE_URL_UNPOOLED` for migrations. The long-lived pg-boss worker uses the direct URL to support its queue session and advisory-lock behavior. Fixture and TinyFish adapters implement the same port. Gemini and OpenAI adapters implement the extraction port. Fixture mode is intended for demos; live mode is restricted to public portal URLs and stops on CAPTCHA or login walls.
 
+## Authentication
+
+Google Identity Services is the only sign-in and sign-up provider. The web app posts Google's ID token to `POST /api/auth/google`; the API verifies its signature and `GOOGLE_CLIENT_ID` audience, requires a verified email, then issues a seven-day HTTP-only JWT cookie. New accounts are keyed by Google's stable `sub`; verified email can link a legacy account once. A short-lived double-submit CSRF cookie protects the credential exchange. Configure the same OAuth web client ID as `GOOGLE_CLIENT_ID` in the API and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` in the web app. The Google client secret is not used by this flow.
+
 ## Local services
 
 - Web: `http://localhost:3000`

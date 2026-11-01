@@ -53,7 +53,8 @@ enum AlertChangeType {
 model User {
   id             String            @id @default(cuid())
   email          String            @unique
-  passwordHash   String
+  passwordHash   String?
+  googleSubject  String?           @unique
   telegramChatId String?
   createdAt      DateTime          @default(now())
   profile        BusinessProfile?

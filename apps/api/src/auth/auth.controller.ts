@@ -1,7 +1,7 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
-import type { Response } from 'express';
+import { BadRequestException, Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { randomBytes } from 'node:crypto';
+import type { Request, Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
-import { loginInputSchema, registerInputSchema } from '@tenderguard/shared';
 import { AuthenticatedRequest, AuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
@@ -12,25 +12,31 @@ const cookieOptions = {
   path: '/api',
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
+const csrfCookieOptions = { ...cookieOptions, maxAge: 5 * 60 * 1000 };
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly auth: AuthService) {}
 
-  @Post('register')
-  @Throttle({ default: { limit: 8, ttl: 60_000 } })
-  async register(@Body() body: unknown, @Res({ passthrough: true }) response: Response) {
-    const input = registerInputSchema.parse(body);
-    const result = await this.auth.register(input.email, input.password);
-    response.cookie('access_token', result.token, cookieOptions);
-    return { user: result.user };
+  @Get('google/csrf')
+  googleCsrf(@Res({ passthrough: true }) response: Response) {
+    const csrfToken = randomBytes(32).toString('hex');
+    response.cookie('google_auth_csrf', csrfToken, csrfCookieOptions);
+    return { csrfToken };
   }
 
-  @Post('login')
-  @Throttle({ default: { limit: 8, ttl: 60_000 } })
-  async login(@Body() body: unknown, @Res({ passthrough: true }) response: Response) {
-    const input = loginInputSchema.parse(body);
-    const result = await this.auth.login(input.email, input.password);
+  @Post('google')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  async google(@Body() body: unknown, @Req() request: Request, @Res({ passthrough: true }) response: Response) {
+    const input = body as { credential?: unknown; csrfToken?: unknown } | null;
+    const cookieToken = request.cookies?.google_auth_csrf;
+    if (typeof input?.csrfToken !== 'string' || typeof cookieToken !== 'string' || input.csrfToken !== cookieToken) {
+      throw new BadRequestException({ code: 'INVALID_CSRF_TOKEN', message: 'Google sign-in could not be verified. Please try again.' });
+    }
+    if (typeof input.credential !== 'string' || input.credential.length > 10_000) {
+      throw new BadRequestException({ code: 'INVALID_GOOGLE_CREDENTIAL', message: 'Google sign-in returned an invalid credential.' });
+    }
+    const result = await this.auth.signInWithGoogle(input.credential);
     response.cookie('access_token', result.token, cookieOptions);
     return { user: result.user };
   }

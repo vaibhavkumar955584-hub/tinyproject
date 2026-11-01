@@ -1,32 +1,68 @@
 'use client';
 
-import { zodResolver } from '@hookform/resolvers/zod';
+import { GoogleLogin, GoogleOAuthProvider, type CredentialResponse } from '@react-oauth/google';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Eye, EyeOff } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { loginInputSchema, registerInputSchema } from '@tenderguard/shared';
-import type { z } from 'zod';
 import { api } from '../lib/api';
 import { BrandLogo } from './brand-logo';
-import { Button, Input, Label } from './ui';
 import { ThemeToggle } from './theme-toggle';
 
-type AuthValues = z.infer<typeof loginInputSchema>;
+type AuthResponse = { user: { id: string; email: string } };
+type AuthMode = 'login' | 'register';
 
-export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
-  const isRegister = mode === 'register';
+function GoogleAuth({ mode }: { mode: AuthMode }) {
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [showPassword, setShowPassword] = useState(false);
-  const form = useForm<AuthValues>({ resolver: zodResolver(isRegister ? registerInputSchema : loginInputSchema), defaultValues: { email: '', password: '' } });
+  const [message, setMessage] = useState<string>();
   const mutation = useMutation({
-    mutationFn: (values: AuthValues) => api<{ user: { id: string; email: string } }>(`/auth/${mode}`, { method: 'POST', body: JSON.stringify(values) }),
-    onSuccess: async () => { await queryClient.invalidateQueries({ queryKey: ['me'] }); router.push(isRegister ? '/onboarding' : '/search'); },
+    mutationFn: async (credential: string) => {
+      const { csrfToken } = await api<{ csrfToken: string }>('/auth/google/csrf');
+      return api<AuthResponse>('/auth/google', { method: 'POST', body: JSON.stringify({ credential, csrfToken }) });
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ['me'] });
+      router.push(mode === 'register' ? '/onboarding' : '/search');
+    },
+    onError: (error: Error) => setMessage(error.message),
   });
 
+  const handleGoogleSuccess = (response: CredentialResponse) => {
+    setMessage(undefined);
+    if (!response.credential) {
+      setMessage('Google did not return a sign-in credential. Please try again.');
+      return;
+    }
+    mutation.mutate(response.credential);
+  };
+
+  return (
+    <div className="mt-8">
+      <div className="flex min-h-[52px] justify-center">
+        {process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ? (
+          <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}>
+            <GoogleLogin onSuccess={handleGoogleSuccess} onError={() => setMessage('Google sign-in was cancelled or could not start. Please try again.')} text={mode === 'register' ? 'signup_with' : 'signin_with'} shape="rectangular" theme="outline" size="large" width="340" />
+          </GoogleOAuthProvider>
+        ) : (
+          <p role="status" className="max-w-sm rounded-xl border border-[#e6e1d8] bg-[#fffefa] px-4 py-3 text-center text-xs leading-5 text-[#777168] dark:border-[#3a342e] dark:bg-[#2d2924] dark:text-[#a49d92]">
+            Google sign-in needs <code className="font-bold">NEXT_PUBLIC_GOOGLE_CLIENT_ID</code> configured for the web app.
+          </p>
+        )}
+      </div>
+      {mutation.isPending && <p role="status" className="mt-4 text-center text-xs text-[#777168] dark:text-[#a49d92]">Verifying your Google account…</p>}
+      {message && <p role="alert" className="mt-4 rounded-xl bg-[#f8eae7] px-3 py-2 text-sm text-[#a93b34] dark:bg-[#3d2622] dark:text-[#e2a8a0]">{message}</p>}
+      <div className="mt-7 flex items-start gap-3 rounded-xl border border-[#dce7df] bg-[#f1f6f2] p-3 text-[11px] leading-5 text-[#52715a] dark:border-[#35463b] dark:bg-[#26332b] dark:text-[#a8c5ac]">
+        <ShieldCheck size={16} className="mt-0.5 shrink-0" />
+        <p>Secure sign-in with Google. TenderGuard never sees or stores your Google password.</p>
+      </div>
+    </div>
+  );
+}
+
+export function AuthForm({ mode }: { mode: AuthMode }) {
+  const isRegister = mode === 'register';
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[minmax(400px,.9fr)_1.1fr]">
       <section className="flex min-h-screen flex-col justify-between bg-[#4d382a] px-6 py-7 text-[#fffefa] sm:px-12 lg:px-16 dark:bg-[#2d2924]">
@@ -40,16 +76,11 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
       <section className="flex min-h-screen items-center justify-center px-5 py-12 sm:px-10 dark:bg-[#24201c]">
         <div className="w-full max-w-[420px] animate-in">
           <p className="eyebrow">{isRegister ? 'Create your workspace' : 'Welcome back'}</p>
-          <h2 className="mt-2 text-3xl font-bold tracking-tight">{isRegister ? 'Start with your business' : 'Sign in to TenderGuard'}</h2>
-          <p className="muted mt-2 text-sm">{isRegister ? 'Your profile stays private to your account.' : 'Pick up where your procurement work left off.'}</p>
-          <form className="mt-8 space-y-5" onSubmit={form.handleSubmit((values) => mutation.mutate(values))}>
-            <div><Label htmlFor="email">Work email</Label><Input id="email" type="email" autoComplete="email" placeholder="you@business.in" {...form.register('email')} />{form.formState.errors.email && <p className="mt-1 text-xs text-[#b9473f] dark:text-[#d99a92]">{form.formState.errors.email.message}</p>}</div>
-            <div><Label htmlFor="password">Password</Label><div className="relative"><Input id="password" type={showPassword ? 'text' : 'password'} autoComplete={isRegister ? 'new-password' : 'current-password'} placeholder={isRegister ? 'At least 10 characters' : 'Your password'} className="field pr-12" {...form.register('password')} /><button type="button" aria-label={showPassword ? 'Hide password' : 'Show password'} onClick={() => setShowPassword((shown) => !shown)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#777168] dark:text-[#a49d92]">{showPassword ? <EyeOff size={17} /> : <Eye size={17} />}</button></div>{form.formState.errors.password && <p className="mt-1 text-xs text-[#b9473f] dark:text-[#d99a92]">{form.formState.errors.password.message}</p>}</div>
-            {mutation.isError && <p role="alert" className="rounded-xl bg-[#f8eae7] px-3 py-2 text-sm text-[#a93b34] dark:bg-[#3d2622] dark:text-[#e2a8a0]">{mutation.error.message}</p>}
-            <Button type="submit" variant="primary" size="lg" className="w-full" disabled={mutation.isPending}>{mutation.isPending ? 'Working…' : isRegister ? 'Create account' : 'Sign in'}{!mutation.isPending && <ArrowRight size={16} />}</Button>
-          </form>
-          <p className="muted mt-6 text-center text-sm">{isRegister ? 'Already have an account?' : 'New to TenderGuard?'} <Link className="font-bold text-[#355a78] underline decoration-[#b9c8d2] underline-offset-4 dark:text-[#8fb3c9] dark:decoration-[#4a5a68]" href={isRegister ? '/login' : '/register'}>{isRegister ? 'Sign in' : 'Create account'}</Link></p>
-          <div className="mt-7 rounded-xl border border-[#e6e1d8] bg-[#fffefa] p-3 text-[11px] leading-5 text-[#777168] dark:border-[#3a342e] dark:bg-[#2d2924] dark:text-[#a49d92]"><strong className="text-[#4d382a] dark:text-[#b19e84]">Demo access</strong><br />When the local database is seeded, use <code className="text-[#4d382a] dark:text-[#b19e84]">demo@tenderguard.local</code> and <code className="text-[#4d382a] dark:text-[#b19e84]">TenderGuardDemo123!</code>.</div>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight">{isRegister ? 'Start with Google' : 'Sign in to TenderGuard'}</h2>
+          <p className="muted mt-2 text-sm">{isRegister ? 'Use your Google account to set up your business workspace.' : 'Continue securely with the Google account linked to your workspace.'}</p>
+          <GoogleAuth mode={mode} />
+          <p className="muted mt-6 text-center text-sm">{isRegister ? 'Already have a workspace?' : 'New to TenderGuard?'} <Link className="font-bold text-[#355a78] underline decoration-[#b9c8d2] underline-offset-4 dark:text-[#8fb3c9] dark:decoration-[#4a5a68]" href={isRegister ? '/login' : '/register'}>{isRegister ? 'Sign in' : 'Create account'}</Link></p>
+          <p className="muted mt-8 flex items-center justify-center gap-2 text-center text-[11px]"><ArrowRight size={13} /> One Google account for sign-in and sign-up</p>
         </div>
       </section>
     </div>

@@ -21,7 +21,9 @@ pnpm dev
 
 Open `http://localhost:3000`. API health is at `http://localhost:4000/api/health`. Mailpit inbox is at `http://localhost:8025`.
 
-Demo account after seeding: `demo@tenderguard.local` / `TenderGuardDemo123!`. Fixture mode is the default and requires no external API keys. Use a separate local database for demos; rotate the seed password before any shared deployment.
+Authentication is Google-only. Set `GOOGLE_CLIENT_ID` for the API and `NEXT_PUBLIC_GOOGLE_CLIENT_ID` for the web app to the same Google OAuth **web client ID**. In Google Cloud Console, add the app origin (for local development, `http://localhost:3000`) to the OAuth client's authorized JavaScript origins, and add the intended users to the OAuth consent screen's test-user list while the app is in testing. The API verifies Google's ID token before creating or linking a TenderGuard account; no Google client secret is used by this flow. Never commit a downloaded OAuth client JSON file.
+
+The seed command adds a demo business profile to the database, but no demo password exists. Sign in with a real Google account to access the app. Fixture mode is the default and requires no external AI API keys.
 
 ## Demo flow
 
@@ -57,10 +59,10 @@ See [architecture](docs/architecture.md), [UI design notes](docs/ui-design.md), 
 | `pnpm typecheck` | Run TypeScript checks |
 | `pnpm test` | Run shared/API/web unit tests |
 | `pnpm test:coverage` | Enforce 90% eligibility coverage thresholds |
-| `pnpm test:e2e` | Run the Playwright demo login → search → evidence smoke flow |
+| `pnpm test:e2e` | Run the Playwright Google-only login and registration UI smoke flow |
 | `pnpm db:up` / `pnpm db:down` | Start/stop Postgres |
 | `pnpm db:migrate` | Apply Prisma migrations |
-| `pnpm db:seed` | Create demo profile and user |
+| `pnpm db:seed` | Create the fixture demo profile (sign-in still requires Google) |
 | `pnpm db:studio` | Open Prisma Studio |
 
 ## Environment and deployment
@@ -71,7 +73,7 @@ For deployment, use a managed PostgreSQL instance and separate web/API deploymen
 
 ## Current limitations
 
-- The Playwright smoke test is wired into CI. Running it locally requires Postgres, migrations, the demo seed, and Chromium (`pnpm exec playwright install chromium`).
+- The Playwright auth smoke test is wired into CI. Running it locally requires Google web client ID configuration and Chromium (`pnpm exec playwright install chromium`).
 - The latest GitHub Actions run currently fails during `prisma migrate deploy`; see [the phase log](docs/phase-log.md). The run's detailed logs are restricted to signed-in GitHub users.
 - Live portal search and notification delivery need real credentials and a running database for end-to-end verification.
 - Database migration/seed and full local run require Docker. Check [the phase log](docs/phase-log.md) for verification results and known gaps.
