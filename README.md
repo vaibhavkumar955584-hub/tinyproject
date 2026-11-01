@@ -72,5 +72,6 @@ For deployment, use a managed PostgreSQL instance and separate web/API deploymen
 ## Current limitations
 
 - The Playwright smoke test is wired into CI. Running it locally requires Postgres, migrations, the demo seed, and Chromium (`pnpm exec playwright install chromium`).
+- The latest GitHub Actions run currently fails during `prisma migrate deploy`; see [the phase log](docs/phase-log.md). The run's detailed logs are restricted to signed-in GitHub users.
 - Live portal search and notification delivery need real credentials and a running database for end-to-end verification.
 - Database migration/seed and full local run require Docker. Check [the phase log](docs/phase-log.md) for verification results and known gaps.

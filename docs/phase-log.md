@@ -32,7 +32,7 @@ The user explicitly asked to complete every phase without the original phase-by-
 
 ## Phase 7 — Hardening
 
-**Status:** Strict typecheck, lint, shared unit tests, 90% coverage thresholds, and web/API production builds pass. GitHub Actions CI runs migration, seed, and the browser smoke flow on Postgres. The browser run could not execute locally because Docker/Postgres is unavailable.
+**Status:** Strict typecheck, lint, shared unit tests, 90% coverage thresholds, and web/API production builds pass. GitHub Actions is configured to run migration, seed, and the browser smoke flow on Postgres. The latest remote run still fails at `prisma migrate deploy`; its detailed step log requires GitHub sign-in and is not available to this session. The browser run could not execute locally because Docker/Postgres is unavailable.
 
 ## Current verification
 
