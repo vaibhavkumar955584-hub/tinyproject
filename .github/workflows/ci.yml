@@ -40,7 +40,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter @tenderguard/api exec prisma generate
       - run: pnpm --filter @tenderguard/api exec prisma migrate deploy
-      - run: pnpm db:seed
+      - run: pnpm db:seed || (output=$(pnpm --filter @tenderguard/api exec tsx prisma/seed.ts 2>&1 || true); echo "::error::$output"; exit 1)
       - run: pnpm typecheck
       - run: pnpm lint
       - run: pnpm test
