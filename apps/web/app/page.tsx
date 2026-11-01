@@ -1,5 +1,6 @@
 import { ArrowRight, BadgeCheck, BookOpenCheck, CheckCircle2, FileSearch, ShieldCheck, WalletCards } from 'lucide-react';
 import Link from 'next/link';
+import { BrandLogo } from '../components/brand-logo';
 
 const features = [
   { icon: FileSearch, label: 'Proof behind every rule', title: 'See the clause, not a guess', body: 'Every extracted condition links back to the exact words in the tender and the public source page.' },
@@ -11,7 +12,7 @@ export default function HomePage() {
   return (
     <main className="overflow-hidden bg-[#f7f5ef] text-[#2b2926]">
       <header className="relative z-10 mx-auto flex max-w-[1320px] items-center justify-between px-5 py-5 sm:px-9">
-        <Link href="/" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#694d38] text-[#fffefa]"><ShieldCheck size={22} /></span><span><b className="block tracking-tight">TenderGuard AI</b><small className="text-[9px] font-bold uppercase tracking-[.17em] text-[#807568]">Procurement clarity</small></span></Link>
+        <Link href="/" aria-label="TenderGuard home" className="flex items-center rounded-lg"><BrandLogo className="h-auto w-[170px] sm:w-[205px]" priority /></Link>
         <nav className="flex items-center gap-2 sm:gap-4"><Link href="/login" className="rounded-xl px-3 py-2 text-xs font-bold text-[#625d55] hover:bg-white/60">Sign in</Link><Link href="/register" className="btn-primary py-2.5 text-xs">Create account <ArrowRight size={15} /></Link></nav>
       </header>
       <section className="relative mx-auto grid max-w-[1320px] items-center gap-10 px-5 pb-20 pt-12 sm:px-9 lg:grid-cols-[1.1fr_.9fr] lg:pb-28 lg:pt-16">

@@ -1,10 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Activity, Bell, Building2, ChevronDown, CircleHelp, FileSearch, LogOut, ShieldCheck, WalletCards } from 'lucide-react';
+import { Activity, Bell, Building2, ChevronDown, CircleHelp, FileSearch, LogOut, WalletCards } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
+import { BrandLogo } from './brand-logo';
 import { api } from '../lib/api';
 
 type Me = { id: string; email: string; hasProfile: boolean };
@@ -38,9 +39,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen lg:flex">
       <aside className="no-print hidden w-[258px] shrink-0 flex-col border-r border-[#e6e1d8] bg-[#f4f0e8] px-5 py-6 lg:flex">
-        <Link href="/search" className="mb-10 flex items-center gap-3 px-2">
-          <span className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#694d38] text-white"><ShieldCheck size={22} /></span>
-          <span><span className="block font-extrabold tracking-tight">TenderGuard</span><span className="block text-[10px] font-bold uppercase tracking-[.17em] text-[#817363]">Procurement AI</span></span>
+        <Link href="/search" aria-label="TenderGuard home" className="mb-10 flex items-center px-2">
+          <BrandLogo className="h-auto w-[190px]" priority />
         </Link>
         <p className="eyebrow mb-3 px-3">Workspace</p>
         <nav className="space-y-1">
@@ -58,7 +58,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       </aside>
       <div className="min-w-0 flex-1 pb-20 lg:pb-0">
         <header className="no-print sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[#e6e1d8] bg-[#f7f5ef]/95 px-5 backdrop-blur sm:px-8">
-          <div className="flex items-center gap-3 lg:hidden"><span className="grid h-9 w-9 place-items-center rounded-xl bg-[#694d38] text-white"><ShieldCheck size={19} /></span><span className="font-extrabold">TenderGuard</span></div>
+          <Link href="/search" aria-label="TenderGuard home" className="flex items-center lg:hidden"><BrandLogo className="h-9 w-auto max-w-[170px]" priority /></Link>
           <div className="hidden items-center gap-2 text-xs text-[#777168] lg:flex"><span>Workspace</span><span>/</span><span className="font-semibold text-[#2b2926]">{navigation.find((item) => pathname.startsWith(item.href))?.label ?? 'Tender detail'}</span></div>
           <div className="flex items-center gap-3">
             <details className="group relative">

@@ -2,7 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { loginInputSchema, registerInputSchema } from '@tenderguard/shared';
 import type { z } from 'zod';
 import { api } from '../lib/api';
+import { BrandLogo } from './brand-logo';
 
 type AuthValues = z.infer<typeof loginInputSchema>;
 
@@ -27,7 +28,7 @@ export function AuthForm({ mode }: { mode: 'login' | 'register' }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[minmax(400px,.9fr)_1.1fr]">
       <section className="flex min-h-screen flex-col justify-between bg-[#4d382a] px-6 py-7 text-[#fffefa] sm:px-12 lg:px-16">
-        <Link href="/" className="flex items-center gap-3"><span className="grid h-10 w-10 place-items-center rounded-[14px] bg-[#f4eee3] text-[#694d38]"><ShieldCheck size={22} /></span><span><strong className="block tracking-tight">TenderGuard AI</strong><span className="text-[10px] font-bold uppercase tracking-[.16em] text-[#d7c8b5]">Procurement clarity</span></span></Link>
+        <Link href="/" aria-label="TenderGuard home" className="inline-flex w-fit items-center rounded-2xl bg-[#fffefa] p-2.5 shadow-sm"><BrandLogo className="h-auto w-[210px]" priority /></Link>
         <div className="my-12 max-w-xl animate-in"><span className="rounded-full border border-white/20 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.15em] text-[#e5d6c3]">For Indian MSMEs</span><h1 className="mt-6 text-4xl font-bold leading-[1.08] tracking-tight sm:text-5xl">Bid with your eyes open.</h1><p className="mt-5 max-w-md text-sm leading-7 text-[#e4d9ca]">See the exact eligibility clauses, spot the risks in your profile, and prepare your documents before you commit to a tender.</p><div className="mt-8 space-y-3 text-sm text-[#efe5d8]"><p className="flex items-center gap-3"><span className="text-[#9fc9a7]">✓</span> Clear BID / RISKY / DON’T BID decisions</p><p className="flex items-center gap-3"><span className="text-[#9fc9a7]">✓</span> Every requirement linked to source evidence</p><p className="flex items-center gap-3"><span className="text-[#9fc9a7]">✓</span> Corrigendum monitoring and change alerts</p></div></div>
         <p className="text-[10px] text-[#cbbba7]">Decision support, not legal advice. Verify against the official tender document.</p>
       </section>

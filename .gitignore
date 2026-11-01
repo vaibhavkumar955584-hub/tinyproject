@@ -13,3 +13,8 @@ dist/
 coverage/
 *.tsbuildinfo
 .neon
+/.claude/skills/
+/.cursor/skills/
+/.codex/skills/
+/.21st/skills.lock
+apps/web/public/brand/preview.png

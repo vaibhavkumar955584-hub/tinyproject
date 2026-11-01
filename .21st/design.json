@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "project": {
+    "name": "TenderGuard AI",
+    "productType": "Procurement decision support for Indian MSMEs",
+    "stack": ["Next.js App Router", "React", "TypeScript", "Tailwind CSS 4"]
+  },
+  "sources": {
+    "tokens": ["apps/web/app/globals.css"],
+    "components": ["apps/web/components/brand-logo.tsx", "apps/web/components/app-shell.tsx"],
+    "assets": ["apps/web/public/brand/tenderguard-wordmark.png", "apps/web/public/brand/tenderguard-mark.png"],
+    "instructions": ["docs/ui-design.md"]
+  },
+  "design": {
+    "colorMode": "light",
+    "colors": {
+      "canvas": "#f7f5ef",
+      "paper": "#fffefa",
+      "ink": "#2b2926",
+      "brown": "#694d38",
+      "blue": "#355a78",
+      "green": "#3f7458",
+      "red": "#b9473f",
+      "border": "#e6e1d8"
+    },
+    "typography": { "family": "Inter, ui-sans-serif, system-ui", "headingWeight": 700 },
+    "spacing": { "base": "4px", "comfortable": "12px", "section": "24px" },
+    "radius": { "control": "12px", "surface": "18px" },
+    "shadows": { "style": "restrained warm shadow" },
+    "motion": { "style": "subtle transitions and short fade-up entrance" },
+    "density": "comfortable"
+  },
+  "components": {
+    "installed": ["BrandLogo"],
+    "preferredPrimitives": ["existing Tailwind utilities", "existing shared UI components"],
+    "patterns": ["evidence-first tender details", "semantic verdict labels", "responsive workspace navigation"]
+  },
+  "constraints": {
+    "must": ["Use the supplied logo through BrandLogo", "Pair semantic status colors with labels and icons", "Keep evidence tied to source text"],
+    "avoid": ["Dark neon palette", "Color-only statuses", "Invented tender facts", "Recoloring the supplied logo"]
+  },
+  "decisions": ["Adapt 21st.dev SeaGreen Minimal cues to TenderGuard's warm paper, brown and blue brand palette."],
+  "evidence": ["docs/ui-design.md", "apps/web/app/globals.css"],
+  "generatedAt": "2026-11-01"
+}

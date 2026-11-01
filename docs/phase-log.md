@@ -53,3 +53,9 @@ The user explicitly asked to complete every phase without the original phase-by-
 - Added AuthModule exports/imports needed for JWT and guard resolution and documented the Neon/local database setup in the architecture guide.
 - `npm run build`: passed after Neon wiring. The pre-existing Next.js dev server on port 3000 returned a stale dev-runtime error during the HTTP smoke check; the production server on port 3001 passed the HTTP check. The API end-to-end health check passed.
 - The Neon CLI emitted a `pg-connection-string` forward-compatibility warning about SSL mode aliases; the current connection succeeded with TLS. No browser sign-in was requested by the CLI.
+
+## Brand and UI system update — 2026-11-01
+
+- Installed and authenticated the 21st.dev Codex skills/CLI; reviewed its `SeaGreen Minimal` theme and adapted its calm surfaces and restrained green accent to TenderGuard's existing warm paper, brown, steel-blue, red, and green palette.
+- Added the supplied transparent TenderGuard wordmark and shield mark to the landing, login/register, workspace navigation, and app icon. Added the shared `BrandLogo` component.
+- Added a project-aware 21st design context under `.21st/` and recorded the shared theme/logo rules in `docs/ui-design.md`.
