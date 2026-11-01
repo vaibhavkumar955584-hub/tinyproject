@@ -51,3 +51,4 @@ export class SearchSuggestController {
     return { suggestions: matches.slice(0, 8) };
   }
 }
+

@@ -11,7 +11,12 @@ async function bootstrap(): Promise<void> {
   const app = await NestFactory.create(AppModule);
   const env = parseEnv();
   app.setGlobalPrefix('api');
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
+      contentSecurityPolicy: false,
+    }),
+  );
   app.use(cookieParser());
   app.useGlobalFilters(new ApiExceptionFilter());
   app.useGlobalInterceptors(new BigIntInterceptor());

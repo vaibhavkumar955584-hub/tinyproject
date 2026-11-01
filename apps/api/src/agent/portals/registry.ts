@@ -250,3 +250,4 @@ export function findPortalForUrl(urlStr: string): PortalRegistryEntry | undefine
     return undefined;
   }
 }
+

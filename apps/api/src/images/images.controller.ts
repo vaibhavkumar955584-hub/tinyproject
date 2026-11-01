@@ -20,6 +20,8 @@ export class ImagesController {
 
     res.setHeader('Content-Type', file.contentType);
     res.setHeader('Content-Length', file.buffer.length);
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.send(file.buffer);
   }
 }

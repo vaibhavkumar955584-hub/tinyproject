@@ -67,3 +67,4 @@ Extract the official tender document details:
     return hash;
   }
 }
+

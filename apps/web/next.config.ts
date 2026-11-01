@@ -7,6 +7,16 @@ const appDirectory = path.dirname(fileURLToPath(import.meta.url));
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.resolve(appDirectory, '../..'),
   devIndicators: false,
+  async rewrites() {
+    const apiTarget = process.env.API_URL_INTERNAL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+    const baseUrl = apiTarget.replace(/\/api\/?$/, '');
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${baseUrl}/api/:path*`,
+      },
+    ];
+  },
   images: {
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',

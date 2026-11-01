@@ -1,4 +1,12 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+function getApiUrl(): string {
+  if (typeof window === 'undefined' && process.env.API_URL_INTERNAL) {
+    return `${process.env.API_URL_INTERNAL.replace(/\/$/, '')}/api`;
+  }
+  if (typeof window !== 'undefined' && !process.env.NEXT_PUBLIC_API_URL && window.location.hostname !== 'localhost') {
+    return '/api';
+  }
+  return process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
+}
 
 export class ApiError extends Error {
   constructor(message: string, readonly status: number, readonly code?: string) {
@@ -8,7 +16,9 @@ export class ApiError extends Error {
 }
 
 export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
+  const apiUrl = getApiUrl();
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const response = await fetch(`${apiUrl}${cleanPath}`, {
     ...init,
     credentials: 'include',
     headers: {
@@ -19,7 +29,7 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
     cache: 'no-store',
   });
   if (!response.ok) {
-    const payload = await response.json().catch(() => ({})) as { message?: string; code?: string };
+    const payload = (await response.json().catch(() => ({}))) as { message?: string; code?: string };
     throw new ApiError(payload.message ?? 'The request could not be completed.', response.status, payload.code);
   }
   if (response.status === 204) return undefined as T;
@@ -27,13 +37,17 @@ export async function api<T>(path: string, init: RequestInit = {}): Promise<T> {
 }
 
 export function apiBaseUrl(): string {
-  return API_URL;
+  return getApiUrl();
 }
 
 export function resolveImageUrl(url?: string | null): string {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const base = API_URL.replace(/\/api\/?$/, '');
   const cleanPath = url.startsWith('/') ? url : `/${url}`;
+  const apiUrl = getApiUrl();
+  if (apiUrl.startsWith('/')) {
+    return cleanPath;
+  }
+  const base = apiUrl.replace(/\/api\/?$/, '');
   return `${base}${cleanPath}`;
 }
