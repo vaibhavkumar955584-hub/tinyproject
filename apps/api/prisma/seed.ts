@@ -1,3 +1,13 @@
+import path from 'node:path';
+import dotenv from 'dotenv';
+
+// Load .env from workspace or monorepo root
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
+dotenv.config({ path: path.resolve(process.cwd(), '.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../../.env.local') });
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
+
 import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -24,4 +34,9 @@ async function seed(): Promise<void> {
   });
 }
 
-seed().finally(() => prisma.$disconnect());
+seed()
+  .catch((err) => {
+    console.error('Prisma seed error:', err);
+    process.exit(1);
+  })
+  .finally(() => prisma.$disconnect());
