@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "test": "jest --runInBand --passWithNoTests",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:seed": "npx tsx prisma/seed.ts",
+    "prisma:seed": "pnpm exec tsx prisma/seed.ts",
     "prisma:studio": "prisma studio",
     "portal:probe": "tsx scripts/portal-probe.ts"
   },
