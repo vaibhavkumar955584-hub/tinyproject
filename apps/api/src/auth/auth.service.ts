@@ -3,9 +3,32 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { OAuth2Client } from 'google-auth-library';
 import { PrismaService } from '../prisma/prisma.service';
-import argon2 from 'argon2';
+import crypto from 'node:crypto';
 
 const COOKIE_NAME = 'tg_session';
+
+function hashPassword(password: string): string {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const derivedKey = crypto.scryptSync(password, salt, 64).toString('hex');
+  return `scrypt:${salt}:${derivedKey}`;
+}
+
+async function verifyPassword(storedHash: string, password: string): Promise<boolean> {
+  if (storedHash.startsWith('scrypt:')) {
+    const parts = storedHash.split(':');
+    if (parts.length !== 3) return false;
+    const salt = parts[1];
+    const expectedKey = parts[2];
+    if (!salt || !expectedKey) return false;
+    const derivedKey = crypto.scryptSync(password, salt, 64).toString('hex');
+    try {
+      return crypto.timingSafeEqual(Buffer.from(derivedKey, 'hex'), Buffer.from(expectedKey, 'hex'));
+    } catch {
+      return false;
+    }
+  }
+  return false;
+}
 
 @Injectable()
 export class AuthService {
@@ -33,7 +56,7 @@ export class AuthService {
   async register(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
     const existing = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (existing) throw new UnauthorizedException({ code: 'AUTH_INVALID', message: 'An account with this email already exists.' });
-    const passwordHash = await argon2.hash(password);
+    const passwordHash = hashPassword(password);
     const user = await this.prisma.user.create({ data: { email: email.toLowerCase(), passwordHash } });
     return this.issueSession(user);
   }
@@ -41,7 +64,7 @@ export class AuthService {
   async login(email: string, password: string): Promise<{ token: string; user: { id: string; email: string } }> {
     const user = await this.prisma.user.findUnique({ where: { email: email.toLowerCase() } });
     if (!user || !user.passwordHash) throw new UnauthorizedException({ code: 'AUTH_INVALID', message: 'Invalid email or password.' });
-    const valid = await argon2.verify(user.passwordHash, password);
+    const valid = await verifyPassword(user.passwordHash, password);
     if (!valid) throw new UnauthorizedException({ code: 'AUTH_INVALID', message: 'Invalid email or password.' });
     return this.issueSession(user);
   }

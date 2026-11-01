@@ -4,7 +4,7 @@
   "scripts": {
     "start": "node dist/main.js",
     "start:dev": "nest start --watch",
-    "build": "pnpm --filter @tenderguard/shared build && prisma generate && nest build && ncc build dist/main.js -o dist/bundled -e argon2 -e sharp -e pg-boss && node -e \"const fs=require('fs'); fs.copyFileSync('dist/bundled/index.js','dist/main.js'); const copyEngines=(src)=>{fs.readdirSync(src,{withFileTypes:true}).forEach(e=>{const sp=src+'/'+e.name; if(e.isDirectory()){copyEngines(sp);}else if(e.name.includes('query_engine')||e.name.endsWith('.node')||e.name.endsWith('.prisma')){fs.copyFileSync(sp,'dist/'+e.name); if(!fs.existsSync('dist/client'))fs.mkdirSync('dist/client',{recursive:true}); fs.copyFileSync(sp,'dist/client/'+e.name);}});}; copyEngines('dist/bundled');\"",
+    "build": "pnpm --filter @tenderguard/shared build && prisma generate && nest build && ncc build dist/main.js -o dist/bundled && node -e \"const fs=require('fs'); fs.copyFileSync('dist/bundled/index.js','dist/main.js'); const copyEngines=(src)=>{fs.readdirSync(src,{withFileTypes:true}).forEach(e=>{const sp=src+'/'+e.name; if(e.isDirectory()){copyEngines(sp);}else if(e.name.includes('query_engine')||e.name.endsWith('.node')||e.name.endsWith('.prisma')){fs.copyFileSync(sp,'dist/'+e.name); if(!fs.existsSync('dist/client'))fs.mkdirSync('dist/client',{recursive:true}); fs.copyFileSync(sp,'dist/client/'+e.name);}});}; copyEngines('dist/bundled');\"",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit -p tsconfig.build.json",
     "test": "jest --runInBand --passWithNoTests",

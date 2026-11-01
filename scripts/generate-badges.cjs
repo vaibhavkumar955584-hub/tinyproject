@@ -25,3 +25,4 @@ dirs.forEach((d) => {
   });
 });
 console.log('Badges generated successfully');
+

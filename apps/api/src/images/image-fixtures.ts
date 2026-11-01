@@ -1,6 +1,13 @@
 import { writeFile, mkdir } from 'node:fs/promises';
 import path from 'node:path';
-import sharp from 'sharp';
+
+function getSharp(): any {
+  try {
+    return Function('m', 'return require(m)')('sharp');
+  } catch {
+    return null;
+  }
+}
 
 function escapeXml(str: string): string {
   return str
@@ -147,6 +154,11 @@ export async function ensureDemoFixtures(storageDir: string): Promise<void> {
       highlightText: 'The bidder shall have average annual turnover of at least Rs. 1 crore during the last three financial years.',
     },
   ];
+
+  const sharp = getSharp();
+  if (!sharp) {
+    return;
+  }
 
   for (const demo of demos) {
     const svg = generateDemoSvg(demo);

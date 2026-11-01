@@ -3,8 +3,15 @@ import { ConfigService } from '@nestjs/config';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
-import sharp from 'sharp';
 import type { TenderImage, TenderImageSource } from '@tenderguard/shared';
+
+function getSharp(): any {
+  try {
+    return Function('m', 'return require(m)')('sharp');
+  } catch {
+    return null;
+  }
+}
 
 export interface ProcessedImageResult {
   source: TenderImageSource;
@@ -50,6 +57,12 @@ export class ImageService {
   ): Promise<ProcessedImageResult> {
     // 1. Redaction & Safety check (Reject login walls or corrupt images)
     if (!rawBuffer || rawBuffer.length < 500) {
+      return this.generateOrgBadgeFallback(tenderId, tenderTitle);
+    }
+
+    const sharp = getSharp();
+    if (!sharp) {
+      this.logger.warn('Sharp image processor not available; using official badge fallback');
       return this.generateOrgBadgeFallback(tenderId, tenderTitle);
     }
 
