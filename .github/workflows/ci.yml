@@ -24,6 +24,7 @@ jobs:
           --health-retries 10
     env:
       DATABASE_URL: postgresql://tenderguard:tenderguard_dev@localhost:5432/tenderguard?schema=public
+      DATABASE_URL_UNPOOLED: postgresql://tenderguard:tenderguard_dev@localhost:5432/tenderguard?schema=public
       JWT_SECRET: ci-only-test-secret-not-for-deployment-123
       AGENT_MODE: fixture
     steps:

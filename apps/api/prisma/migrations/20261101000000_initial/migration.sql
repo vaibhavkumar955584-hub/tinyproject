@@ -240,4 +240,4 @@ ALTER TABLE "alerts" ADD CONSTRAINT "alerts_userId_fkey" FOREIGN KEY ("userId") 
 ALTER TABLE "alerts" ADD CONSTRAINT "alerts_tenderId_fkey" FOREIGN KEY ("tenderId") REFERENCES "tenders"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "agent_logs" ADD CONSTRAINT "agent_logs_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "search_jobs"("id") ON DELETE CASCADE ON UPDATE CASCADE;\n
+ALTER TABLE "agent_logs" ADD CONSTRAINT "agent_logs_jobId_fkey" FOREIGN KEY ("jobId") REFERENCES "search_jobs"("id") ON DELETE CASCADE ON UPDATE CASCADE;

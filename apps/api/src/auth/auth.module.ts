@@ -9,6 +9,6 @@ import { AuthService } from './auth.service';
   imports: [JwtModule.registerAsync({ useFactory: (config: ConfigService) => ({ secret: config.getOrThrow<string>('JWT_SECRET') }), inject: [ConfigService] })],
   controllers: [AuthController],
   providers: [AuthService, AuthGuard],
-  exports: [AuthGuard, AuthService],
+  exports: [AuthGuard, AuthService, JwtModule],
 })
 export class AuthModule {}

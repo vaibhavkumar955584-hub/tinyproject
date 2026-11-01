@@ -9,7 +9,7 @@ flowchart LR
   Browser[Next.js web app] -->|REST / SSE| API[NestJS API]
   API --> Shared[Shared Zod schemas and DTOs]
   Web[Next.js web app] --> Shared
-  API --> DB[(PostgreSQL 16)]
+  API --> DB[(Neon PostgreSQL)]
   API --> Queue[pg-boss jobs]
   Queue --> Agent[WebAgentPort]
   Agent --> TinyFish[TinyFish Search and Fetch]
@@ -18,13 +18,14 @@ flowchart LR
   LLM --> Providers[Gemini / OpenAI]
 ```
 
-PostgreSQL stores profiles, jobs, public tender text, evidence, verdicts, watches, snapshots, alerts, and audit logs. pg-boss queues searches; the API streams logs over SSE. Fixture and TinyFish adapters implement the same port. Gemini and OpenAI adapters implement the extraction port. Fixture mode is intended for demos; live mode is restricted to public portal URLs and stops on CAPTCHA or login walls.
+Neon PostgreSQL stores profiles, jobs, public tender text, evidence, verdicts, watches, snapshots, alerts, and audit logs. Prisma uses the pooled `DATABASE_URL` for application queries and `DATABASE_URL_UNPOOLED` for migrations. The long-lived pg-boss worker uses the direct URL to support its queue session and advisory-lock behavior. Fixture and TinyFish adapters implement the same port. Gemini and OpenAI adapters implement the extraction port. Fixture mode is intended for demos; live mode is restricted to public portal URLs and stops on CAPTCHA or login walls.
 
 ## Local services
 
 - Web: `http://localhost:3000`
 - API health: `http://localhost:4000/api/health`
-- PostgreSQL: `localhost:5432` (database/user `tenderguard`, development-only password `tenderguard_dev`)
+- Local PostgreSQL (optional): `localhost:5432` (database/user `tenderguard`, development-only password `tenderguard_dev`)
+- Neon setup: run `neon deploy`; it writes pooled and direct connection variables into the root `.env` (or `.env.local`). Keep both files out of version control.
 - Mailpit: `http://localhost:8025` (local email preview)
 
 Use `.env.example` as the safe template. Do not put provider credentials in committed files.
@@ -39,4 +40,4 @@ Stitch MCP generated dashboard and evidence-detail reference screens. The detail
 - TinyFish access is isolated behind `WebAgentPort`; outbound tender URLs are restricted to HTTPS on CPPP/GeM hosts.
 - Public page fetches never solve CAPTCHAs, authenticate, or submit bids.
 - Verdicts use deterministic templates and verified clause quotes. Provider output never sets a verdict directly.
-- Docker/Postgres is required for the API, queue, migration, and seed. Without Docker, the web production build and shared logic tests still run, but API end-to-end behavior cannot be verified locally.
+- A reachable PostgreSQL database is required for the API, queue, migration, and seed. Local Docker Postgres remains an optional development alternative to Neon.

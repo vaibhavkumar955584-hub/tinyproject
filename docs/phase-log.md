@@ -42,4 +42,14 @@ The user explicitly asked to complete every phase without the original phase-by-
 - `pnpm test:coverage`: passed (100% statements/lines/functions and 93.27% branches for eligibility).
 - `pnpm exec playwright test --list`: passed (one login → search → evidence smoke test discovered).
 - `pnpm build`: passed (Next.js and NestJS production builds).
-- `pnpm db:up`: blocked because the Docker Desktop Linux engine was unavailable; migration, seed, and end-to-end flows could not be exercised in this environment.
+
+## Neon deployment update — 2026-11-01
+
+- Initialized Neon for the existing `production` branch and enabled the Postgres service; `neon deploy` applied the branch policy and pulled the pooled and direct database URLs into the ignored root `.env`.
+- Added `@neon/config` and `@neon/env`, generated the root `neon.ts` branch policy, and ignored `.env.local` as well as `.env` and `.neon`.
+- Configured Prisma application connections to use the pooled URL and Prisma migrations to use the direct URL. The pg-boss worker uses the direct URL for its long-lived connection and starts after module initialization completes.
+- Applied the initial Prisma migration to Neon and confirmed the migration status is up to date. Fixed the initial SQL migration's trailing escaped newline that prevented PostgreSQL from parsing it.
+- API health returned `{"status":"ok","database":"ok"}` while the API and pg-boss worker were running, proving the service can connect to Neon and execute a query. The production Next.js server returned HTTP 200 and rendered the TenderGuard home page.
+- Added AuthModule exports/imports needed for JWT and guard resolution and documented the Neon/local database setup in the architecture guide.
+- `npm run build`: passed after Neon wiring. The pre-existing Next.js dev server on port 3000 returned a stale dev-runtime error during the HTTP smoke check; the production server on port 3001 passed the HTTP check. The API end-to-end health check passed.
+- The Neon CLI emitted a `pg-connection-string` forward-compatibility warning about SSL mode aliases; the current connection succeeded with TLS. No browser sign-in was requested by the CLI.

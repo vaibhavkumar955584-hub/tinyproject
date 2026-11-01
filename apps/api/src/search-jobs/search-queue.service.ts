@@ -10,7 +10,11 @@ export class SearchQueueService implements OnModuleInit, OnModuleDestroy {
   constructor(private readonly config: ConfigService) {}
 
   async onModuleInit(): Promise<void> {
-    this.boss = new PgBoss(this.config.getOrThrow<string>('DATABASE_URL'));
+    // pg-boss holds advisory locks and listens for queue notifications. Use the
+    // direct Neon endpoint for this long-lived worker; Prisma uses the pooled URL.
+    const connectionString = this.config.get<string>('DATABASE_URL_UNPOOLED')
+      ?? this.config.getOrThrow<string>('DATABASE_URL');
+    this.boss = new PgBoss(connectionString);
     this.boss.on('error', (error) => this.logger.error(`pg-boss: ${error.message}`));
     await this.boss.start();
     await this.boss.createQueue('search.run');

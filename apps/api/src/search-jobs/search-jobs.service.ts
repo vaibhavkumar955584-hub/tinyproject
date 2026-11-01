@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto';
-import { Inject, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, Logger, NotFoundException, OnApplicationBootstrap } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { evaluateEligibility } from '@tenderguard/shared';
 import type { TenderSource } from '@tenderguard/shared';
@@ -10,7 +10,7 @@ import { WEB_AGENT_PORT, type RawTender, type SearchQuery, type TenderRef, type 
 import { SearchQueueService } from './search-queue.service';
 
 @Injectable()
-export class SearchJobsService implements OnModuleInit {
+export class SearchJobsService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SearchJobsService.name);
 
   constructor(
@@ -20,7 +20,7 @@ export class SearchJobsService implements OnModuleInit {
     @Inject(WEB_AGENT_PORT) private readonly agent: WebAgentPort,
   ) {}
 
-  async onModuleInit(): Promise<void> {
+  async onApplicationBootstrap(): Promise<void> {
     await this.queue.workSearch((jobId) => this.runJob(jobId));
   }
 

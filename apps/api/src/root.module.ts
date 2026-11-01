@@ -1,4 +1,5 @@
 import { Controller, Get, Module } from '@nestjs/common';
+import { resolve } from 'node:path';
 import { APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
@@ -12,18 +13,22 @@ import { TendersModule } from './tenders/tenders.module';
 import { WatchesModule } from './watches/watches.module';
 import { AlertsModule } from './alerts/alerts.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { PrismaService } from './prisma/prisma.service';
 
 @Controller('health')
 class HealthController {
+  constructor(private readonly prisma: PrismaService) {}
+
   @Get()
-  getHealth(): { status: 'ok' } {
-    return { status: 'ok' };
+  async getHealth(): Promise<{ status: 'ok'; database: 'ok' }> {
+    await this.prisma.$queryRaw`SELECT 1`;
+    return { status: 'ok', database: 'ok' };
   }
 }
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, validate: (config) => parseEnv(config) }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: [resolve(process.cwd(), '.env.local'), resolve(process.cwd(), '.env'), resolve(process.cwd(), '../../.env.local'), resolve(process.cwd(), '../../.env')], validate: (config) => parseEnv(config) }),
     ThrottlerModule.forRoot([{ ttl: 60_000, limit: 60 }]),
     ScheduleModule.forRoot(),
     PrismaModule,
