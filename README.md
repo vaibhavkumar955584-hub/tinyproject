@@ -1,117 +1,64 @@
-# Internship Radar: Starter Template
+# TenderGuard AI
 
-Workshop template for **Building with Web Agents** (TinyFish x GITM).
-Copy this folder (or click **Use this template** on GitHub), and you'll have a working radar in about 15 minutes.
+Evidence-backed procurement decision support for Indian small businesses and MSMEs.
 
-You build it in four stages. Each stage is its own file, so if you get stuck you can jump ahead.
+> Other tools find tenders. TenderGuard tells you which ones you'll be rejected for, before you pay the EMD and spend weeks on paperwork, and it proves every answer.
 
-| Stage | File | What it does |
-|---|---|---|
-| 1 | `stage1_single.py` | One agent reads one careers page and prints JSON |
-| 2 | `stage2_loop.py` | A loop over many pages, saved to `internships.json` |
-| 3 | `stage3_parallel.py` | All pages at once with `asyncio.gather` |
-| 4 | `stage4_search.py` | Search finds the pages, agents work them |
+**Decision support, not legal advice. Verify against the official tender document.** TenderGuard is designed for public pages only: it will not bypass CAPTCHAs, log in as a bidder, or submit bids. A CAPTCHA or login wall must stop that tender and be marked for a manual step.
 
-`config.py` holds the pages and the goal, so you only edit one file to point the radar at your own companies.
+## Current status
 
-## 1. Get set up (5 min)
+Phase 0 scaffold is in place. The app shells, shared package, local Postgres service, environment template, and documentation are ready. Product features are added one phase at a time; see [the phase log](docs/phase-log.md) and [architecture notes](docs/architecture.md).
 
-1. Sign up at **tinyfish.ai/students** with your **school email + password**.
-   "Continue with Google" does **not** give you the $35 credit.
-2. Create an API key at **agent.tinyfish.ai/api-keys**.
-3. In this folder:
+The original TinyFish workshop Python examples remain in the repository during the transition.
 
-**Mac / Linux**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
-```
+## Quickstart
 
-**Windows (PowerShell)**
+Requirements: Node.js 20+, pnpm 10+, and Docker Compose.
+
 ```powershell
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-copy .env.example .env
+Copy-Item .env.example .env
+pnpm install
+pnpm db:up
+pnpm dev
 ```
 
-4. Open `.env` and paste your key:
+The web shell is at `http://localhost:3000`; the API health endpoint is `http://localhost:4000/api/health`. Postgres is available on port 5432. Current phase does not yet require API provider keys; fixture mode is the default.
 
-```
-TINYFISH_API_KEY=paste-your-key-here
-```
+To stop Postgres, run `pnpm db:down`.
 
-`.env` is in `.gitignore`, so it won't be committed. **Never paste your key into a public repo, a screenshot or a WhatsApp group.**
+## Workspace
 
-## 2. Run the stages
-
-```bash
-python stage1_single.py
-python stage2_loop.py
-python stage3_parallel.py
-python stage4_search.py
+```text
+apps/web       Next.js App Router shell
+apps/api       NestJS REST API shell
+packages/shared Shared Zod schemas and environment parsing
+docs/          Architecture and phase notes
+fixtures/      Tender HTML/PDF text fixtures (added in Phase 2/3)
 ```
 
-A run takes **30 to 90 seconds**. That is normal. A sync run stops at 2 minutes.
+## Scripts
 
-> **Always look at the result.** A run can say `COMPLETED` and still return an empty list. The goal can fail while the run succeeds. Every stage here prints the result so you can tell.
-
-## 3. Make it yours
-
-Edit `config.py`:
-
-- Add your own companies to `PAGES`.
-- Change `GOAL` to what you care about, for example *"Find AI or data internships in India or remote."*
-- Name the fields you want in the goal for cleaner JSON.
-
-## 4. Put it on autopilot (Monitor)
-
-No code needed:
-
-1. Go to **agent.tinyfish.ai/monitor**.
-2. New monitor, then Page monitor, and paste a careers page.
-3. Run it daily and turn on email on changes.
-
-Costs about $0.15 a month from your $35.
-
-## 5. Give your coding agent the live web (MCP)
-
-```bash
-# Claude Code
-claude mcp add --transport http tinyfish https://agent.tinyfish.ai/mcp
-
-# Codex
-codex mcp add tinyfish --url https://agent.tinyfish.ai/mcp
-```
-
-Cursor: add this to your MCP config.
-
-```json
-{ "mcpServers": { "tinyfish": { "url": "https://agent.tinyfish.ai/mcp" } } }
-```
-
-The first connection opens your browser to sign in. Then ask your agent: *"Use the TinyFish tools to find AI internships and save them to a JSON file."*
-
-## Stuck? Try this first
-
-| If this happens | Try this |
+| Command | Purpose |
 |---|---|
-| `401` or "unauthorized" | Check `.env` has `TINYFISH_API_KEY`, or export it in this terminal again |
-| It's taking ages | 30 to 90 seconds is normal. Sync runs stop at 2 minutes |
-| "Blocked" or empty result | That site blocks bots. Set `browser_profile` to `"stealth"`, or try another page |
-| Wrong or messy JSON | Name the fields you want in the goal, or pass an `output_schema` |
-| Agent didn't use TinyFish | Start with "Use the TinyFish tools to…" and check the MCP server is connected |
-| No $35 in your wallet | Check you signed up with your school email and a password |
-| `source` not found on Windows | Use `.venv\Scripts\activate` |
-| Still stuck | Hand up. Someone will come to help |
+| `pnpm dev` | Start web and API in parallel |
+| `pnpm build` | Build workspace packages |
+| `pnpm lint` | Lint workspace packages |
+| `pnpm typecheck` | Type-check workspace packages |
+| `pnpm test` | Run workspace tests |
+| `pnpm db:up` | Start PostgreSQL 16 |
+| `pnpm db:migrate` | Apply Prisma migrations (introduced in Phase 1) |
+| `pnpm db:seed` | Seed development data (introduced in Phase 1) |
+| `pnpm db:studio` | Open Prisma Studio (introduced in Phase 1) |
 
-Docs: **docs.tinyfish.ai**. Coding agents can read **docs.tinyfish.ai/for-coding-agents**.
-Paste that link into ChatGPT, Claude or Cursor and ask it anything.
+## Environment
 
-## Bounty
+Copy `.env.example` to `.env`. The example contains only local development defaults and blank provider credential fields. Never commit real credentials. Environment schema lives in `packages/shared/src/env.ts`.
 
-Submit on **tinybounties.com** with the event code from the room.
-A valid submission includes a LinkedIn post and an X post, both tagging TinyFish.
-"# helperguidertinyfish" 
+## UI design
+
+The product brief specifies an accessible responsive interface with indigo `#3730A3`, teal `#0D9488`, explicit verdict icons and labels, and an evidence drawer for exact source clauses. Stitch MCP was requested for UI design, but a Stitch connector is not currently available to this session. See [the UI integration note](docs/architecture.md#ui-design-integration).
+
+## Phased implementation
+
+The build follows the approved phase gates in the supplied product brief. Work pauses after each phase for the user to say `continue`. Read [docs/phase-log.md](docs/phase-log.md) for completed checks and known limitations.
