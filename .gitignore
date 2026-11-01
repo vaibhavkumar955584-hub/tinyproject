@@ -22,3 +22,5 @@ apps/web/public/brand/preview.png
 .vercel
 .env*
 /uploads/
+test-results/
+playwright-report/

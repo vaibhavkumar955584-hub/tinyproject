@@ -2,7 +2,7 @@
 
 import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Bot, Building2, CheckCircle2, ShieldCheck, Sparkles, Mail, Lock, User } from 'lucide-react';
+import { ArrowRight, Building2, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -34,6 +34,7 @@ function GoogleAuth({ mode }: { mode: AuthMode }) {
       const { csrfToken } = await api<{ csrfToken: string }>('/auth/google/csrf');
       return api<AuthResponse>('/auth/google', {
         method: 'POST',
+        headers: { 'X-Requested-With': 'XmlHttpRequest' },
         body: JSON.stringify({ code, csrfToken }),
       });
     },
@@ -60,89 +61,22 @@ function GoogleAuth({ mode }: { mode: AuthMode }) {
   });
 
   return (
-    <div className="mt-4">
+    <div className="mt-6">
       <button
         type="button"
         onClick={() => signInWithGoogle()}
         disabled={mutation.isPending}
-        className="flex h-11 w-full items-center justify-center gap-3 rounded-xl border border-[#E8DED2] bg-[#FFFFFF] px-4 text-xs font-bold text-[#2E2118] shadow-sm transition hover:bg-[#FAF7F2] dark:border-[#38312A] dark:bg-[#28231E] dark:text-[#F2EBE1]"
+        className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border border-[#d7d0c6] bg-[#fffefa] px-4 text-sm font-bold text-[#32281f] shadow-sm transition hover:bg-[#f5f1e9] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#355a78] focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-60 dark:border-[#51483e] dark:bg-[#2d2924] dark:text-[#f5efe4] dark:hover:bg-[#39332c]"
       >
         <GoogleMark />
         {mutation.isPending ? 'Verifying Google account…' : mode === 'register' ? 'Sign up with Google' : 'Sign in with Google'}
       </button>
       {message && <p role="alert" className="mt-3 rounded-lg bg-[#FAEDE9] p-2.5 text-xs text-[#A83832] dark:bg-[#382421] dark:text-[#DE8F87]">{message}</p>}
-    </div>
-  );
-}
-
-function EmailPasswordAuth({ mode }: { mode: AuthMode }) {
-  const router = useRouter();
-  const queryClient = useQueryClient();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState<string>();
-  const [error, setError] = useState<string>();
-  const [pending, setPending] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setMessage(undefined);
-    setError(undefined);
-    setPending(true);
-    try {
-      const endpoint = mode === 'register' ? '/auth/register' : '/auth/login';
-      await api<AuthResponse>(endpoint, {
-        method: 'POST',
-        body: JSON.stringify({ email, password }),
-      });
-      await queryClient.invalidateQueries({ queryKey: ['me'] });
-      router.push('/overview');
-    } catch (err: any) {
-      setError(err.message || 'Authentication failed. Please try again.');
-    } finally {
-      setPending(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-3 mt-4">
-      <div className="grid grid-cols-2 gap-3">
-        <div className="relative">
-          <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B6259]" />
-          <input
-            id="email"
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="w-full h-10 rounded-xl border border-[#E8DED2] bg-[#FFFFFF] pl-9 pr-3 text-xs text-[#2E2118] placeholder:text-[#A3998C] focus:outline-none focus:ring-1 focus:ring-[#6B4226] dark:border-[#38312A] dark:bg-[#221D19] dark:text-[#F2EBE1] dark:placeholder:text-[#9E958A]"
-          />
-        </div>
-        <div className="relative">
-          <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B6259]" />
-          <input
-            id="password"
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            minLength={6}
-            className="w-full h-10 rounded-xl border border-[#E8DED2] bg-[#FFFFFF] pl-9 pr-3 text-xs text-[#2E2118] placeholder:text-[#A3998C] focus:outline-none focus:ring-1 focus:ring-[#6B4226] dark:border-[#38312A] dark:bg-[#221D19] dark:text-[#F2EBE1] dark:placeholder:text-[#9E958A]"
-          />
-        </div>
+      <div className="mt-5 flex items-start gap-3 rounded-xl border border-[#dce7df] bg-[#f1f6f2] p-3 text-[11px] leading-5 text-[#52715a] dark:border-[#35463b] dark:bg-[#26332b] dark:text-[#a8c5ac]">
+        <ShieldCheck size={16} className="mt-0.5 shrink-0" />
+        <p>Secure sign-in with Google. TenderGuard never sees or stores your Google password.</p>
       </div>
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full h-10 items-center justify-center gap-2 rounded-xl border border-transparent bg-[#6B4226] px-4 py-2 text-xs font-bold text-white shadow-sm transition hover:bg-[#52311A] dark:hover:bg-[#B8977E] disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        {pending ? 'Please wait…' : mode === 'register' ? 'Create account' : 'Sign in'}
-      </button>
-      {error && <p role="alert" className="mt-1 rounded-lg bg-[#FAEDE9] p-2.5 text-xs text-[#A83832] dark:bg-[#382421] dark:text-[#DE8F87]">{error}</p>}
-      {message && <p className="mt-1 rounded-lg bg-[#EBF4EF] p-2.5 text-xs text-[#2F6B4F] dark:bg-[#202E26] dark:text-[#7BB896]">{message}</p>}
-    </form>
+    </div>
   );
 }
 
@@ -150,8 +84,8 @@ function GoogleAuthContent({ mode }: { mode: AuthMode }) {
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   if (!clientId) {
     return (
-      <div className="mt-4 rounded-xl border border-[#E8DED2] bg-[#FAF7F2] p-3 text-center text-xs text-[#6B6259] dark:border-[#38312A] dark:bg-[#1A1613] dark:text-[#9E958A]">
-        Google sign-in is optional. Click <b>Continue as Demo MSME</b> below for instant full-feature access.
+      <div className="mt-6 rounded-xl border border-[#E8DED2] bg-[#FAF7F2] p-3 text-center text-xs text-[#6B6259] dark:border-[#38312A] dark:bg-[#1A1613] dark:text-[#9E958A]">
+        Google OAuth client is configured. Click <b>Continue as Demo MSME Workspace</b> below for instant evaluator access.
       </div>
     );
   }
@@ -210,27 +144,20 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
         </p>
       </section>
 
-      {/* Right Login / Register Panel */}
+      {/* Right Google Auth Panel */}
       <section className="flex min-h-screen items-center justify-center px-6 py-12 sm:px-12 dark:bg-[#1A1613]">
         <div className="w-full max-w-[420px]">
           <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#6B4226] dark:text-[#B8977E]">
             {isRegister ? 'New Workspace' : 'Welcome Back'}
           </span>
           <h2 className="mt-1 text-2xl font-bold tracking-tight text-[#2E2118] dark:text-[#F2EBE1]">
-            {isRegister ? 'Start with TenderGuard' : 'Sign in to TenderGuard'}
+            {isRegister ? 'Start with Google' : 'Sign in to TenderGuard'}
           </h2>
           <p className="mt-1 text-xs text-[#6B6259] dark:text-[#9E958A]">
-            Access your government tender intelligence workspace.
+            {isRegister
+              ? 'Use your Google account to set up your business workspace.'
+              : 'Continue securely with the Google account linked to your workspace.'}
           </p>
-
-          {/* Email/Password Form */}
-          <EmailPasswordAuth mode={mode} />
-
-          <div className="my-5 flex items-center gap-3">
-            <span className="h-px flex-1 bg-[#E8DED2] dark:bg-[#38312A]" />
-            <span className="text-[10px] uppercase font-bold text-[#8C8276]">Or with Google</span>
-            <span className="h-px flex-1 bg-[#E8DED2] dark:bg-[#38312A]" />
-          </div>
 
           <GoogleAuthContent mode={mode} />
 

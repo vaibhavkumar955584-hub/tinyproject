@@ -135,8 +135,8 @@ const INITIAL_FIXTURE_TENDERS: TenderCardData[] = [
     alsoOn: ['GeM', 'UP GePNIC'],
     reason: 'Annual turnover passes (₹30L vs ₹15L required). MSME is 100% exempt from ₹90,000 EMD.',
     image: {
-      thumbUrl: '/api/images/thumbs/demo-cppp-001.webp',
-      fullUrl: '/api/images/full/demo-cppp-001.webp',
+      thumbUrl: '/images/thumbs/demo-cppp-001.webp',
+      fullUrl: '/images/full/demo-cppp-001.webp',
       source: 'SCREENSHOT',
       alt: 'Screenshot of public tender notice DEMO-CPPP-001 from eprocure.gov.in',
     },
@@ -190,8 +190,8 @@ const INITIAL_FIXTURE_TENDERS: TenderCardData[] = [
     alsoOn: ['UP GePNIC'],
     reason: 'Turnover requirement is tight (₹28L vs ₹30L). Corrigendum #1 extended submission to Nov 10.',
     image: {
-      thumbUrl: '/api/images/thumbs/demo-cppp-002.webp',
-      fullUrl: '/api/images/full/demo-cppp-002.webp',
+      thumbUrl: '/images/thumbs/demo-cppp-002.webp',
+      fullUrl: '/images/full/demo-cppp-002.webp',
       source: 'SCREENSHOT',
       alt: 'Screenshot of public tender notice DEMO-CPPP-002 from eprocure.gov.in',
     },
@@ -243,8 +243,8 @@ const INITIAL_FIXTURE_TENDERS: TenderCardData[] = [
     whyMatched: 'Matched keywords "support", "operations" in data center category',
     reason: 'Hard disqualification: ₹1.00 Cr turnover required (you have ₹30L) and mandatory Gujarat branch office.',
     image: {
-      thumbUrl: '/api/images/thumbs/demo-gem-001.webp',
-      fullUrl: '/api/images/full/demo-gem-001.webp',
+      thumbUrl: '/images/thumbs/demo-gem-001.webp',
+      fullUrl: '/images/full/demo-gem-001.webp',
       source: 'SCREENSHOT',
       alt: 'Screenshot of public tender notice DEMO-GEM-001 from gem.gov.in',
     },
@@ -287,6 +287,7 @@ function TenderCardThumbnail({
   tender: TenderCardData;
   onClick: () => void;
 }) {
+  const [imgLoaded, setImgLoaded] = useState(false);
   const [imgFailed, setImgFailed] = useState(false);
   const portalName = tender.portalId || tender.source || 'CPPP';
 
@@ -311,46 +312,51 @@ function TenderCardThumbnail({
       className="relative shrink-0 w-full sm:w-44 aspect-[16/9] sm:aspect-[4/3] rounded-lg overflow-hidden border border-[#E4DAC9] bg-[#F3EDE3] group cursor-pointer"
       onClick={onClick}
     >
-      {imageSrc && !imgFailed ? (
+      {/* Base Layer: Gazette Seal Badge - always in DOM, never broken */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#F3EDE3] p-2 text-center select-none">
+        <div className="w-12 h-10 rounded-lg bg-[#6B4226] text-[#FAF7F2] font-bold text-sm flex items-center justify-center shadow-sm">
+          {orgInitials}
+        </div>
+        <span className="mt-1.5 text-[10px] font-bold tracking-wider text-[#7A6A5A] uppercase">
+          {portalName} Gazette
+        </span>
+        <span className="text-[9px] text-[#7A6A5A]/80 line-clamp-1 max-w-[120px]">
+          {tender.department || 'Public Tender Notice'}
+        </span>
+      </div>
+
+      {/* Image Layer: Fades in smoothly once loaded; hidden completely if failed */}
+      {imageSrc && !imgFailed && (
         <img
           src={imageSrc}
           alt={tender.image?.alt || `Notice image for ${tender.title}`}
-          className="w-full h-full object-cover object-top transition duration-300 group-hover:scale-105"
+          className={`absolute inset-0 w-full h-full object-cover object-top transition duration-300 group-hover:scale-105 ${
+            imgLoaded ? 'opacity-100' : 'opacity-0'
+          }`}
+          onLoad={() => setImgLoaded(true)}
           onError={() => setImgFailed(true)}
         />
+      )}
+
+      {/* Top Badge: Shows 'Page capture' only if image actually loaded */}
+      {tender.image?.source === 'SCREENSHOT' && imgLoaded && !imgFailed ? (
+        <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-[#2E2118]/85 px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#FAF7F2] backdrop-blur-sm z-10">
+          <Camera size={10} className="text-emerald-400" />
+          Page capture
+        </span>
       ) : (
-        <div className="w-full h-full flex flex-col items-center justify-center bg-[#F3EDE3] p-2 text-center select-none">
-          <div className="w-12 h-10 rounded-lg bg-[#6B4226] text-[#FAF7F2] font-bold text-sm flex items-center justify-center shadow-sm">
-            {orgInitials}
-          </div>
-          <span className="mt-1.5 text-[10px] font-bold tracking-wider text-[#7A6A5A] uppercase">
-            {portalName} Gazette
-          </span>
-          <span className="text-[9px] text-[#7A6A5A]/80 line-clamp-1 max-w-[120px]">
-            {tender.department || 'Public Tender Notice'}
-          </span>
-        </div>
+        <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-[#6B4226]/85 px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#FAF7F2] backdrop-blur-sm z-10">
+          {portalName} Gazette
+        </span>
       )}
 
       {/* Hover overlay hint */}
-      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10">
         <span className="inline-flex items-center gap-1 rounded-md bg-[#2E2118]/85 px-2 py-1 text-[11px] font-semibold text-[#FAF7F2] shadow">
           <Maximize2 size={12} />
           Expand Proof
         </span>
       </div>
-
-      {/* Page capture badge */}
-      {tender.image?.source === 'SCREENSHOT' && !imgFailed ? (
-        <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-[#2E2118]/85 px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#FAF7F2] backdrop-blur-sm">
-          <Camera size={10} className="text-emerald-400" />
-          Page capture
-        </span>
-      ) : (
-        <span className="absolute top-1.5 left-1.5 inline-flex items-center gap-1 rounded bg-[#6B4226]/85 px-1.5 py-0.5 text-[9px] font-mono font-bold text-[#FAF7F2] backdrop-blur-sm">
-          {portalName} Gazette
-        </span>
-      )}
     </div>
   );
 }
@@ -1703,7 +1709,7 @@ export default function SearchPage() {
                       if (target.dataset.failed) return;
                       target.dataset.failed = 'true';
                       target.src = resolveImageUrl(
-                        `/api/images/badges/${encodeURIComponent(selectedProofTender.portalId || selectedProofTender.source)}.svg`
+                        `/images/badges/${encodeURIComponent(selectedProofTender.portalId || selectedProofTender.source)}.svg`
                       );
                     }}
                   />
@@ -1873,7 +1879,7 @@ export default function SearchPage() {
                 src={resolveImageUrl(
                   lightboxTender.image?.fullUrl ||
                     lightboxTender.image?.thumbUrl ||
-                    `/api/images/badges/${encodeURIComponent(lightboxTender.portalId || lightboxTender.source)}.svg`
+                    `/images/badges/${encodeURIComponent(lightboxTender.portalId || lightboxTender.source)}.svg`
                 )}
                 alt={lightboxTender.image?.alt || lightboxTender.title}
                 className={`transition-transform duration-300 rounded shadow-xl ${
@@ -1885,7 +1891,7 @@ export default function SearchPage() {
                   if (target.dataset.failed) return;
                   target.dataset.failed = 'true';
                   target.src = resolveImageUrl(
-                    `/api/images/badges/${encodeURIComponent(lightboxTender.portalId || lightboxTender.source)}.svg`
+                    `/images/badges/${encodeURIComponent(lightboxTender.portalId || lightboxTender.source)}.svg`
                   );
                 }}
               />

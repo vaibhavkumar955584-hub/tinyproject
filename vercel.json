@@ -20,6 +20,12 @@
   },
   "rewrites": [
     {
+      "source": "/api/images/(.*)",
+      "destination": {
+        "service": "web"
+      }
+    },
+    {
       "source": "/api/(.*)",
       "destination": {
         "service": "api"

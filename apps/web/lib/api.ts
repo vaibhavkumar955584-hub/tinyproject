@@ -43,14 +43,9 @@ export function apiBaseUrl(): string {
 export function resolveImageUrl(url?: string | null): string {
   if (!url) return '';
   if (url.startsWith('http://') || url.startsWith('https://')) return url;
-  const cleanPath = url.startsWith('/') ? url : `/${url}`;
-  if (typeof window !== 'undefined') {
-    return cleanPath;
+  let cleanPath = url.startsWith('/') ? url : `/${url}`;
+  if (cleanPath.startsWith('/api/images/')) {
+    cleanPath = cleanPath.replace(/^\/api\/images\//, '/images/');
   }
-  const apiUrl = getApiUrl();
-  if (apiUrl.startsWith('/')) {
-    return cleanPath;
-  }
-  const base = apiUrl.replace(/\/api\/?$/, '');
-  return `${base}${cleanPath}`;
+  return cleanPath;
 }

@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="320" viewBox="0 0 480 320">
+  <rect width="480" height="320" fill="#FAF7F2"/>
+  <rect x="2" y="2" width="476" height="316" rx="14" fill="none" stroke="#E4DAC9" stroke-width="2"/>
+  <circle cx="240" cy="140" r="50" fill="#DDE9DF"/>
+  <path d="M225 140 L235 150 L255 130" fill="none" stroke="#2F6B4F" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="240" y="230" fill="#2E2118" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="bold" text-anchor="middle">IT SERVICES</text>
+</svg>

@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
     const baseUrl = apiTarget.replace(/\/api\/?$/, '');
     return [
       {
+        source: '/api/images/:path*',
+        destination: '/images/:path*',
+      },
+      {
         source: '/api/:path*',
         destination: `${baseUrl}/api/:path*`,
       },
