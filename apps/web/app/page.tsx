@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   ArrowRight,
   Check,
@@ -260,6 +261,21 @@ export default function HomePage() {
 
       {/* 2. HERO SECTION */}
       <section className="relative mx-auto max-w-6xl px-5 py-[72px] lg:py-[120px] sm:px-8">
+        {/* Blended hero image — dark/light aware */}
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 opacity-[0.35] dark:opacity-[0.25] object-cover w-full h-full"
+        >
+          <Image
+            src="/brand/hero-preview.png"
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            priority
+            className="object-cover"
+          />
+        </div>
+
         {/* Faint 24px dot grid behind hero */}
         <div
           aria-hidden="true"
