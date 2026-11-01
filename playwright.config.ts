@@ -11,29 +11,15 @@ export default defineConfig({
     trace: 'retain-on-failure',
     ...devices['Desktop Chrome'],
   },
-  webServer: [
-    {
-      command: 'pnpm --filter @tenderguard/api start:dev',
-      url: 'http://localhost:4000/api/health',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      env: {
-        ...process.env,
-        AGENT_MODE: 'fixture',
-        WEB_ORIGIN: 'http://localhost:3000',
-        PORT: '4000',
-      },
+  webServer: {
+    command: process.env.CI ? 'pnpm --filter @tenderguard/web start' : 'pnpm --filter @tenderguard/web dev',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120_000,
+    env: {
+      ...process.env,
+      PORT: '3000',
+      NEXT_PUBLIC_API_URL: 'http://localhost:4000/api',
     },
-    {
-      command: process.env.CI ? 'pnpm --filter @tenderguard/web start' : 'pnpm --filter @tenderguard/web dev',
-      url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120_000,
-      env: {
-        ...process.env,
-        NEXT_PUBLIC_API_URL: 'http://localhost:4000/api',
-        PORT: '3000',
-      },
-    },
-  ],
+  },
 });
