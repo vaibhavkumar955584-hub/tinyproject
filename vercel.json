@@ -1,13 +1,21 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "buildCommand": "pnpm install && pnpm --filter @tenderguard/shared build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
   "services": {
     "api": {
       "root": "apps/api",
-      "entrypoint": "dist/main.js"
+      "entrypoint": "dist/main.js",
+      "buildCommand": "pnpm install && pnpm --filter @tenderguard/shared build && pnpm build",
+      "devCommand": "pnpm start:dev"
     },
     "web": {
       "root": "apps/web",
       "framework": "nextjs",
+      "buildCommand": "pnpm install && pnpm --filter @tenderguard/shared build && pnpm build",
+      "devCommand": "pnpm dev",
       "bindings": [
         {
           "type": "service",
